@@ -1,1125 +1,1055 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>☀️ Summer Weight Loss Challenge</title>
-  <meta name="description" content="Pallavi, Ashwini & Murali's summer fitness tracker" />
-  <meta property="og:title" content="☀️ Summer Weight Loss Challenge" />
-  <meta property="og:description" content="Track daily calorie goals and weekly weight progress" />
-  <meta property="og:type" content="website" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="description" content="Summer Weight Loss Challenge - Family Fitness Tracker">
+  <meta name="robots" content="noindex, nofollow">
+  <title>&#9728;&#65039; Summer Weight Loss Challenge</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    /* ─── VARIABLES ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     :root {
-      --green:   #06D6A0;
-      --amber:   #FFD166;
-      --red:     #EF476F;
-      --bg1:     #FF6B35;
-      --bg2:     #FFD166;
-      --bg3:     #06D6A0;
-      --bg4:     #118AB2;
-      --surface: rgba(255,255,255,0.12);
-      --surface2: rgba(255,255,255,0.22);
-      --text:    #1a1a2e;
-      --text-light: rgba(255,255,255,0.92);
-      --radius:  18px;
-      --shadow:  0 8px 32px rgba(0,0,0,0.18);
+      --orange: #FF6B35;
+      --yellow: #FFD166;
+      --green: #06D6A0;
+      --blue: #118AB2;
+      --red: #EF476F;
+      --bg: #FFF8F0;
+      --card: #FFFFFF;
+      --text: #2D2D2D;
+      --text-light: #777;
+      --shadow: 0 4px 20px rgba(0,0,0,0.08);
+      --radius: 20px;
+      --radius-sm: 12px;
     }
 
-    /* ─── RESET / BASE ──────────────────────────────────────── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { font-size: 16px; }
     body {
       font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #FFF8F0 0%, #FFF0E8 50%, #F0FFF8 100%);
       min-height: 100vh;
-      background: linear-gradient(135deg, var(--bg1) 0%, var(--bg2) 35%, var(--bg3) 70%, var(--bg4) 100%);
-      background-attachment: fixed;
-      color: var(--text-light);
-      overflow-x: hidden;
-      padding-bottom: 40px;
+      color: var(--text);
     }
 
-    /* ─── ANIMATED BG BLOBS ─────────────────────────────────── */
-    .blob-wrap { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
-    .blob {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(60px);
-      opacity: 0.35;
-      animation: blobFloat 12s ease-in-out infinite;
-    }
-    .blob-1 { width: 340px; height: 340px; background: #FF6B35; top: -80px; left: -60px; animation-delay: 0s; }
-    .blob-2 { width: 280px; height: 280px; background: #06D6A0; bottom: 0; right: -40px; animation-delay: -4s; }
-    .blob-3 { width: 200px; height: 200px; background: #FFD166; top: 40%; left: 30%; animation-delay: -8s; }
+    .screen { display: none; min-height: 100vh; }
+    .screen.active { display: block; }
 
-    @keyframes blobFloat {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      33%       { transform: translate(30px, -20px) scale(1.08); }
-      66%       { transform: translate(-20px, 15px) scale(0.95); }
-    }
-
-    /* ─── FLOATERS ──────────────────────────────────────────── */
-    .floaters { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
-    .floater {
-      position: absolute;
-      font-size: 1.6rem;
-      animation: floatUp 10s ease-in infinite;
-      opacity: 0;
-    }
-    @keyframes floatUp {
-      0%   { opacity: 0; transform: translateY(0) rotate(0deg); }
-      10%  { opacity: 0.7; }
-      90%  { opacity: 0.5; }
-      100% { opacity: 0; transform: translateY(-110vh) rotate(360deg); }
-    }
-
-    /* ─── LAYOUT ────────────────────────────────────────────── */
-    #app {
-      position: relative;
-      z-index: 1;
-      max-width: 480px;
-      margin: 0 auto;
-      padding: 0 14px;
-    }
-
-    /* ─── HEADER ────────────────────────────────────────────── */
-    .header {
-      text-align: center;
-      padding: 32px 0 18px;
-    }
-    .header-sun {
-      font-size: 3rem;
-      display: inline-block;
-      animation: sunSpin 6s linear infinite;
-    }
-    @keyframes sunSpin {
-      0%   { transform: rotate(0deg) scale(1); }
-      50%  { transform: rotate(180deg) scale(1.15); }
-      100% { transform: rotate(360deg) scale(1); }
-    }
-    .header h1 {
-      font-family: 'Fredoka One', cursive;
-      font-size: clamp(1.5rem, 6vw, 2rem);
-      line-height: 1.2;
-      text-shadow: 0 2px 12px rgba(0,0,0,0.25);
-      margin-top: 6px;
-    }
-    .header p {
-      font-size: 0.82rem;
-      opacity: 0.85;
-      margin-top: 4px;
-    }
-
-    /* ─── QUOTE TICKER ──────────────────────────────────────── */
-    .quote-bar {
-      background: var(--surface);
-      backdrop-filter: blur(10px);
-      border-radius: 50px;
-      padding: 8px 18px;
-      text-align: center;
-      font-size: 0.78rem;
-      font-weight: 500;
-      margin-bottom: 18px;
-      border: 1px solid rgba(255,255,255,0.25);
-      animation: shimmer 4s ease-in-out infinite;
-    }
-    @keyframes shimmer {
-      0%, 100% { opacity: 0.85; }
-      50%       { opacity: 1; }
-    }
-
-    /* ─── SECTION TITLE ─────────────────────────────────────── */
-    .section-title {
-      font-family: 'Fredoka One', cursive;
-      font-size: 1.15rem;
-      margin: 22px 0 10px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    /* ─── PERSON CARD ───────────────────────────────────────── */
-    .person-card {
-      background: var(--surface);
-      backdrop-filter: blur(14px);
-      border: 1px solid rgba(255,255,255,0.28);
-      border-radius: var(--radius);
-      padding: 16px;
-      margin-bottom: 12px;
-      box-shadow: var(--shadow);
-      transition: transform 0.2s;
-    }
-    .person-card:active { transform: scale(0.98); }
-
-    .person-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 12px;
-    }
-    .person-info { display: flex; align-items: center; gap: 10px; }
-    .person-avatar {
-      width: 44px; height: 44px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.2);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.5rem;
-      border: 2px solid rgba(255,255,255,0.4);
-    }
-    .person-name {
-      font-family: 'Fredoka One', cursive;
-      font-size: 1.15rem;
-    }
-    .person-pts {
-      font-size: 0.7rem;
-      opacity: 0.8;
-      margin-top: 1px;
-    }
-    .streak-badge {
-      font-size: 0.8rem;
-      background: rgba(255,255,255,0.18);
-      border-radius: 50px;
-      padding: 4px 10px;
-      font-weight: 600;
-    }
-    .streak-badge.on-fire {
-      background: linear-gradient(135deg, #FF6B35, #FFD166);
-      animation: streakPulse 1s ease-in-out infinite;
-      color: #1a1a2e;
-    }
-    @keyframes streakPulse {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(255,107,53,0.5); }
-      50%       { box-shadow: 0 0 0 8px rgba(255,107,53,0); }
-    }
-
-    /* ─── RAG BUTTONS ───────────────────────────────────────── */
-    .rag-buttons {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-    }
-    .rag-btn {
-      border: none;
-      border-radius: 12px;
-      padding: 12px 6px;
-      font-family: 'Poppins', sans-serif;
-      font-size: 0.78rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+    /* ===== LOGIN ===== */
+    #login-screen {
+      background: linear-gradient(160deg, #FF6B35 0%, #FFD166 40%, #06D6A0 80%, #118AB2 100%);
       display: flex;
       flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      color: #1a1a2e;
-    }
-    .rag-btn:active { transform: scale(0.93); }
-    .rag-btn .rag-icon { font-size: 1.5rem; }
-    .rag-btn.green  { background: var(--green); }
-    .rag-btn.amber  { background: var(--amber); }
-    .rag-btn.red    { background: var(--red); color: #fff; }
-    .rag-btn.selected { box-shadow: 0 0 0 3px white, 0 0 0 5px rgba(255,255,255,0.4); transform: scale(1.04); }
-    .rag-btn.dimmed { opacity: 0.35; cursor: default; }
-
-    /* ─── TODAY DONE BANNER ─────────────────────────────────── */
-    .done-banner {
-      text-align: center;
-      padding: 10px;
-      background: rgba(6,214,160,0.25);
-      border-radius: 10px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      border: 1px solid rgba(6,214,160,0.5);
-    }
-
-    /* ─── FEEDBACK MSG ──────────────────────────────────────── */
-    .feedback-msg {
-      text-align: center;
-      font-size: 0.8rem;
-      font-weight: 600;
-      padding: 8px 0 2px;
-      min-height: 26px;
-      transition: all 0.3s;
-    }
-
-    /* ─── WEEK STRIP ────────────────────────────────────────── */
-    .week-strip-card {
-      background: var(--surface);
-      backdrop-filter: blur(14px);
-      border: 1px solid rgba(255,255,255,0.28);
-      border-radius: var(--radius);
-      padding: 16px;
-      box-shadow: var(--shadow);
-      margin-bottom: 12px;
-    }
-    .week-strip-person {
-      margin-bottom: 10px;
-    }
-    .week-strip-person:last-child { margin-bottom: 0; }
-    .strip-label {
-      font-size: 0.72rem;
-      font-weight: 600;
-      opacity: 0.8;
-      margin-bottom: 5px;
-    }
-    .strip-days {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 4px;
-    }
-    .strip-day {
-      border-radius: 6px;
-      height: 26px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.58rem;
-      font-weight: 600;
-      background: rgba(255,255,255,0.1);
-      color: rgba(255,255,255,0.5);
-    }
-    .strip-day.green { background: var(--green); color: #1a1a2e; }
-    .strip-day.amber { background: var(--amber); color: #1a1a2e; }
-    .strip-day.red   { background: var(--red);   color: #fff; }
-    .strip-day.today { border: 2px solid white; color: white; }
-
-    /* ─── LEADERBOARD ───────────────────────────────────────── */
-    .leaderboard-card {
-      background: var(--surface);
-      backdrop-filter: blur(14px);
-      border: 1px solid rgba(255,255,255,0.28);
-      border-radius: var(--radius);
-      padding: 16px;
-      box-shadow: var(--shadow);
-      margin-bottom: 12px;
-    }
-    .podium {
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      gap: 10px;
-      margin: 14px 0 8px;
-    }
-    .podium-slot {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-    }
-    .podium-avatar { font-size: 1.6rem; }
-    .podium-name {
-      font-size: 0.72rem;
-      font-weight: 600;
-    }
-    .podium-pts {
-      font-size: 0.68rem;
-      opacity: 0.8;
-    }
-    .podium-block {
-      border-radius: 8px 8px 0 0;
-      width: 64px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Fredoka One', cursive;
-      font-size: 1.2rem;
-      color: #1a1a2e;
-    }
-    .podium-block.p1 { height: 70px; background: linear-gradient(180deg, #FFD700, #FFA500); }
-    .podium-block.p2 { height: 50px; background: linear-gradient(180deg, #E0E0E0, #BDBDBD); }
-    .podium-block.p3 { height: 36px; background: linear-gradient(180deg, #CD7F32, #A0522D); }
-
-    /* ─── WEIGHT SECTION ────────────────────────────────────── */
-    .weight-card {
-      background: var(--surface);
-      backdrop-filter: blur(14px);
-      border: 1px solid rgba(255,255,255,0.28);
-      border-radius: var(--radius);
-      padding: 16px;
-      box-shadow: var(--shadow);
-      margin-bottom: 12px;
-    }
-    .weight-person {
-      margin-bottom: 16px;
-    }
-    .weight-person:last-child { margin-bottom: 0; }
-    .weight-person-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 8px;
-    }
-    .weight-name {
-      font-weight: 600;
-      font-size: 0.9rem;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .weight-target {
-      font-size: 0.7rem;
-      opacity: 0.75;
-    }
-    .progress-track {
-      height: 12px;
-      background: rgba(255,255,255,0.15);
-      border-radius: 50px;
-      overflow: hidden;
-      margin-bottom: 6px;
-    }
-    .progress-fill {
-      height: 100%;
-      border-radius: 50px;
-      background: linear-gradient(90deg, var(--green), #118AB2);
-      transition: width 1s cubic-bezier(0.4,0,0.2,1);
-      position: relative;
-      overflow: hidden;
-    }
-    .progress-fill::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.35) 50%, transparent 100%);
-      animation: progressShine 2s ease-in-out infinite;
-    }
-    @keyframes progressShine {
-      0%   { transform: translateX(-100%); }
-      100% { transform: translateX(200%); }
-    }
-    .progress-labels {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.65rem;
-      opacity: 0.75;
-    }
-    .weight-input-row {
-      display: flex;
-      gap: 8px;
-      margin-top: 8px;
-      align-items: center;
-    }
-    .weight-input {
-      flex: 1;
-      background: rgba(255,255,255,0.15);
-      border: 1px solid rgba(255,255,255,0.35);
-      border-radius: 10px;
-      padding: 9px 12px;
-      color: white;
-      font-family: 'Poppins', sans-serif;
-      font-size: 0.9rem;
-      outline: none;
-    }
-    .weight-input::placeholder { color: rgba(255,255,255,0.5); }
-    .weight-input:focus { border-color: rgba(255,255,255,0.65); background: rgba(255,255,255,0.2); }
-    .weight-save-btn {
-      background: rgba(255,255,255,0.25);
-      border: 1px solid rgba(255,255,255,0.4);
-      border-radius: 10px;
-      color: white;
-      font-family: 'Poppins', sans-serif;
-      font-weight: 600;
-      font-size: 0.82rem;
-      padding: 9px 14px;
-      cursor: pointer;
-      transition: background 0.2s;
-      white-space: nowrap;
-    }
-    .weight-save-btn:hover { background: rgba(255,255,255,0.35); }
-
-    /* ─── SETTINGS BUTTON ───────────────────────────────────── */
-    .settings-btn {
-      display: block;
-      width: 100%;
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.25);
-      border-radius: 12px;
-      color: white;
-      font-family: 'Poppins', sans-serif;
-      font-size: 0.82rem;
-      font-weight: 500;
-      padding: 11px;
-      cursor: pointer;
-      text-align: center;
-      margin-top: 8px;
-      transition: background 0.2s;
-    }
-    .settings-btn:hover { background: rgba(255,255,255,0.2); }
-
-    /* ─── MODAL ─────────────────────────────────────────────── */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 100;
-      background: rgba(0,0,0,0.55);
-      backdrop-filter: blur(6px);
-      display: flex;
       align-items: center;
       justify-content: center;
       padding: 20px;
-      animation: fadeIn 0.25s ease;
+      position: relative;
+      overflow: hidden;
     }
-    .modal-overlay.hidden { display: none; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-    .modal {
-      background: linear-gradient(135deg, #1a1a3e 0%, #16213e 100%);
-      border: 1px solid rgba(255,255,255,0.18);
-      border-radius: 22px;
-      padding: 26px 22px;
-      width: 100%;
-      max-width: 400px;
-      max-height: 88vh;
-      overflow-y: auto;
-      box-shadow: 0 24px 64px rgba(0,0,0,0.5);
-      animation: slideUp 0.3s cubic-bezier(0.34,1.56,0.64,1);
-    }
-    @keyframes slideUp {
-      from { transform: translateY(40px); opacity: 0; }
-      to   { transform: translateY(0);    opacity: 1; }
-    }
-    .modal h2 {
-      font-family: 'Fredoka One', cursive;
-      font-size: 1.4rem;
-      text-align: center;
-      margin-bottom: 6px;
-      color: white;
-    }
-    .modal p { font-size: 0.8rem; opacity: 0.7; text-align: center; margin-bottom: 20px; color: white; }
-
-    .modal-person {
-      margin-bottom: 18px;
-      padding: 14px;
-      background: rgba(255,255,255,0.07);
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,0.12);
-    }
-    .modal-person-name {
-      font-weight: 700;
-      font-size: 0.95rem;
-      margin-bottom: 10px;
-      color: white;
-    }
-    .modal-field {
-      margin-bottom: 8px;
-    }
-    .modal-field label {
-      display: block;
-      font-size: 0.72rem;
-      opacity: 0.75;
-      margin-bottom: 4px;
-      color: white;
-    }
-    .modal-input {
-      width: 100%;
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.25);
-      border-radius: 10px;
-      padding: 9px 12px;
-      color: white;
-      font-family: 'Poppins', sans-serif;
-      font-size: 0.9rem;
-      outline: none;
-    }
-    .modal-input:focus { border-color: var(--green); background: rgba(255,255,255,0.15); }
-
-    .modal-save-btn {
-      width: 100%;
-      background: linear-gradient(135deg, var(--green), #118AB2);
-      border: none;
-      border-radius: 14px;
-      color: #1a1a2e;
-      font-family: 'Fredoka One', cursive;
-      font-size: 1.1rem;
-      padding: 14px;
-      cursor: pointer;
-      margin-top: 8px;
-      transition: transform 0.15s, box-shadow 0.15s;
-      box-shadow: 0 4px 16px rgba(6,214,160,0.4);
-    }
-    .modal-save-btn:active { transform: scale(0.97); }
-
-    /* ─── CONFETTI ───────────────────────────────────────────── */
-    .confetti-piece {
-      position: fixed;
-      width: 10px;
-      height: 10px;
-      border-radius: 2px;
+    .float-bg {
+      position: absolute;
+      font-size: 3rem;
+      animation: floatAround var(--duration, 8s) ease-in-out infinite;
+      opacity: 0.15;
       pointer-events: none;
-      z-index: 999;
-      animation: confettiFall var(--dur) ease-in forwards;
+      user-select: none;
+    }
+
+    @keyframes floatAround {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-30px) rotate(15deg); }
+    }
+    @keyframes sunPulse {
+      0%, 100% { transform: scale(1) rotate(0deg); }
+      50% { transform: scale(1.1) rotate(180deg); }
+    }
+    @keyframes shimmer {
+      0% { background-position: -200% center; }
+      100% { background-position: 200% center; }
+    }
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-10px); }
+      40% { transform: translateX(10px); }
+      60% { transform: translateX(-8px); }
+      80% { transform: translateX(8px); }
     }
     @keyframes confettiFall {
-      0%   { transform: translate(0, 0) rotate(0deg); opacity: 1; }
-      100% { transform: translate(var(--dx), var(--dy)) rotate(var(--rot)); opacity: 0; }
+      0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+    }
+    @keyframes popIn {
+      0% { transform: scale(0); opacity: 0; }
+      70% { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    @keyframes streakFlame {
+      0%, 100% { transform: scale(1) rotate(-5deg); }
+      50% { transform: scale(1.3) rotate(5deg); }
+    }
+    @keyframes pulseRing {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(255,107,53,0.4); }
+      50% { box-shadow: 0 0 0 10px rgba(255,107,53,0); }
     }
 
-    /* ─── TOAST ─────────────────────────────────────────────── */
-    .toast {
-      position: fixed;
-      bottom: 30px;
-      left: 50%;
-      transform: translateX(-50%) translateY(80px);
-      background: rgba(26,26,46,0.95);
-      color: white;
-      border-radius: 50px;
-      padding: 12px 22px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      z-index: 200;
-      transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s;
-      opacity: 0;
-      border: 1px solid rgba(255,255,255,0.2);
-      white-space: nowrap;
-      pointer-events: none;
-    }
-    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-
-    /* ─── FOOTER ────────────────────────────────────────────── */
-    .footer {
+    .login-card {
+      background: rgba(255,255,255,0.97);
+      border-radius: 30px;
+      padding: 40px 30px;
+      width: 100%;
+      max-width: 380px;
       text-align: center;
-      padding: 24px 0 8px;
-      font-size: 0.7rem;
-      opacity: 0.55;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+      animation: fadeSlideUp 0.6s ease both;
+      position: relative;
+      z-index: 10;
+    }
+
+    .login-sun {
+      font-size: 3.5rem;
+      display: block;
+      margin-bottom: 8px;
+      animation: sunPulse 4s ease-in-out infinite;
+    }
+
+    .login-title {
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.65rem;
+      line-height: 1.2;
+      margin-bottom: 6px;
+      background: linear-gradient(135deg, #FF6B35 0%, #FFD166 50%, #06D6A0 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      background-size: 300%;
+      animation: shimmer 4s linear infinite;
+    }
+
+    .login-subtitle { color: var(--text-light); font-size: 0.85rem; margin-bottom: 28px; }
+
+    .step { display: none; }
+    .step.active { display: block; }
+
+    .name-prompt { font-size: 1rem; font-weight: 600; margin-bottom: 18px; color: var(--text); }
+
+    .name-buttons { display: flex; flex-direction: column; gap: 12px; }
+
+    .name-btn {
+      padding: 16px;
+      border: 2px solid #EEE;
+      border-radius: var(--radius-sm);
+      background: #FAFAFA;
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .name-btn:hover {
+      border-color: var(--orange);
+      background: linear-gradient(135deg, #FF6B35, #FFD166);
+      color: white;
+      transform: scale(1.02);
+      box-shadow: 0 6px 20px rgba(255,107,53,0.3);
+    }
+    .name-btn:active { transform: scale(0.97); }
+
+    .pin-header { font-size: 0.88rem; color: var(--text-light); margin-bottom: 4px; }
+    .pin-user { font-family: 'Fredoka One', cursive; font-size: 1.5rem; margin-bottom: 20px; color: var(--orange); }
+
+    .pin-dots { display: flex; justify-content: center; gap: 18px; margin-bottom: 26px; }
+    .pin-dot {
+      width: 20px; height: 20px; border-radius: 50%;
+      border: 2px solid #CCC; background: transparent; transition: all 0.15s;
+    }
+    .pin-dot.filled { background: var(--orange); border-color: var(--orange); animation: popIn 0.2s ease; }
+
+    .pin-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+
+    .pin-key {
+      padding: 18px;
+      border: none;
+      border-radius: 15px;
+      background: #F4F4F4;
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.12s;
+      user-select: none;
+    }
+    .pin-key:hover { background: #E8E8E8; }
+    .pin-key:active { transform: scale(0.90); background: #DDD; }
+    .pin-key.delete { background: #FFF0E8; color: var(--orange); font-size: 1.2rem; }
+    .pin-key.empty { background: transparent; cursor: default; }
+    .pin-key.empty:hover { background: transparent; }
+
+    .pin-error { color: var(--red); font-size: 0.85rem; margin-top: 14px; min-height: 20px; }
+    .back-btn { background: none; border: none; color: var(--text-light); cursor: pointer; font-size: 0.82rem; margin-top: 14px; text-decoration: underline; font-family: 'Poppins', sans-serif; }
+
+    /* ===== MAIN APP ===== */
+    #app { max-width: 480px; margin: 0 auto; padding: 0 0 80px; }
+
+    .app-header {
+      background: linear-gradient(135deg, #FF6B35 0%, #FFD166 100%);
+      padding: 20px 20px 35px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .app-header::after {
+      content: '';
+      position: absolute;
+      bottom: -1px; left: 0; right: 0;
+      height: 30px;
+      background: #FFF8F0;
+      border-radius: 30px 30px 0 0;
+    }
+
+    .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+
+    .user-chip {
+      background: rgba(255,255,255,0.3); padding: 6px 14px;
+      border-radius: 20px; font-size: 0.82rem; font-weight: 600; color: white;
+    }
+    .logout-btn {
+      background: rgba(255,255,255,0.2); border: none; border-radius: 20px;
+      padding: 6px 14px; color: white; font-size: 0.78rem; cursor: pointer;
+      font-family: 'Poppins', sans-serif; transition: background 0.2s;
+    }
+    .logout-btn:hover { background: rgba(255,255,255,0.35); }
+
+    .app-title {
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.5rem; color: white;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      line-height: 1.2;
+    }
+
+    .floating-emojis { position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; overflow: hidden; }
+    .fe {
+      position: absolute; font-size: 1.4rem;
+      animation: floatAround var(--d) ease-in-out infinite;
+      animation-delay: var(--delay); opacity: 0.25;
+    }
+
+    /* Bottom Nav */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: white; border-top: 1px solid #F0F0F0;
+      display: flex; padding: 6px 0 16px; z-index: 100;
+      max-width: 480px; margin: 0 auto;
+    }
+    .bn-item {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; gap: 2px; padding: 6px;
+      cursor: pointer; border: none; background: none;
+      font-family: 'Poppins', sans-serif;
+      color: var(--text-light); font-size: 0.62rem; font-weight: 600;
+      transition: color 0.2s;
+    }
+    .bn-icon { font-size: 1.3rem; }
+    .bn-item.active { color: var(--orange); }
+
+    .tab-content { display: none; padding: 0 16px; }
+    .tab-content.active { display: block; }
+
+    /* Cards */
+    .card {
+      background: white; border-radius: var(--radius);
+      padding: 20px; margin-bottom: 14px;
+      box-shadow: var(--shadow);
+    }
+    .card-title {
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.05rem; margin-bottom: 14px;
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    /* Today */
+    .today-date { font-size: 0.82rem; color: var(--text-light); text-align: center; margin-bottom: 2px; padding-top: 14px; }
+    .today-greeting { font-family: 'Fredoka One', cursive; font-size: 1.25rem; text-align: center; margin-bottom: 14px; }
+
+    .motivation-card {
+      background: linear-gradient(135deg, #118AB2 0%, #06D6A0 100%);
+      color: white; border-radius: var(--radius); padding: 18px;
+      margin-bottom: 14px; position: relative; overflow: hidden;
+    }
+    .motivation-emoji { font-size: 1.8rem; margin-bottom: 6px; display: block; }
+    .motivation-quote { font-size: 0.9rem; font-weight: 500; line-height: 1.55; }
+
+    .streak-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: linear-gradient(135deg, #FF6B35, #FFD166);
+      color: white; padding: 8px 18px; border-radius: 20px;
+      font-weight: 700; font-size: 0.88rem; margin-bottom: 14px;
+      animation: pulseRing 2s ease-in-out infinite;
+    }
+    .flame-icon { animation: streakFlame 0.7s ease-in-out infinite; display: inline-block; }
+
+    .checkin-label { font-size: 0.88rem; color: var(--text-light); margin-bottom: 14px; }
+
+    .rag-buttons { display: flex; gap: 10px; justify-content: center; margin-bottom: 10px; }
+    .rag-btn {
+      flex: 1; max-width: 108px; padding: 14px 6px;
+      border: 3px solid transparent; border-radius: var(--radius-sm);
+      cursor: pointer; font-family: 'Poppins', sans-serif;
+      font-weight: 700; font-size: 0.75rem; transition: all 0.2s;
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+    }
+    .rag-emoji { font-size: 1.7rem; }
+    .rag-btn.green-btn { background: #E8FFF7; border-color: #06D6A0; color: #047A5B; }
+    .rag-btn.amber-btn { background: #FFFDE8; border-color: #FFD166; color: #7A5F00; }
+    .rag-btn.red-btn   { background: #FFF0F3; border-color: #EF476F; color: #9A0030; }
+    .rag-btn.green-btn:hover, .rag-btn.green-btn.selected { background: #06D6A0; color: white; transform: scale(1.05); box-shadow: 0 6px 20px rgba(6,214,160,0.4); }
+    .rag-btn.amber-btn:hover, .rag-btn.amber-btn.selected { background: #FFD166; color: #5A4500; transform: scale(1.05); box-shadow: 0 6px 20px rgba(255,209,102,0.45); }
+    .rag-btn.red-btn:hover, .rag-btn.red-btn.selected   { background: #EF476F; color: white; transform: scale(1.05); box-shadow: 0 6px 20px rgba(239,71,111,0.4); }
+    .rag-btn:active { transform: scale(0.94) !important; }
+
+    .logged-note { font-size: 0.82rem; color: var(--text-light); text-align: center; }
+
+    /* Family today */
+    .family-row { display: flex; gap: 10px; }
+    .member-card-sm {
+      flex: 1; text-align: center; padding: 12px 6px;
+      border-radius: var(--radius-sm); background: #F9F9F9;
+    }
+    .member-name-sm { font-weight: 700; font-size: 0.78rem; margin-bottom: 6px; }
+    .rag-circle {
+      width: 34px; height: 34px; border-radius: 50%;
+      margin: 0 auto 4px; display: flex; align-items: center;
+      justify-content: center; font-size: 0.9rem; font-weight: 700; color: white;
+    }
+    .rag-circle.green { background: #06D6A0; }
+    .rag-circle.amber { background: #FFD166; color: #5A4500; }
+    .rag-circle.red   { background: #EF476F; }
+    .rag-circle.none  { background: #E0E0E0; color: #999; }
+    .rag-circle-label { font-size: 0.62rem; color: var(--text-light); }
+
+    /* Week strip */
+    .week-strip { display: flex; gap: 4px; }
+    .day-cell { flex: 1; text-align: center; }
+    .day-label { font-size: 0.6rem; color: var(--text-light); margin-bottom: 4px; font-weight: 600; }
+    .day-dot {
+      width: 24px; height: 24px; border-radius: 50%;
+      margin: 0 auto 2px; display: flex;
+      align-items: center; justify-content: center;
+      font-size: 0.6rem; font-weight: 800; color: white;
+    }
+    .day-dot.green { background: #06D6A0; }
+    .day-dot.amber { background: #FFD166; color: #5A4500; }
+    .day-dot.red   { background: #EF476F; }
+    .day-dot.none  { background: #E8E8E8; color: #BBB; }
+    .day-dot.future { background: #F0F0F0; color: #CCC; }
+    .day-dot.today-ring { outline: 2px solid var(--orange); outline-offset: 2px; }
+
+    /* Weekly tab */
+    .weight-entry {
+      display: flex; align-items: center; gap: 12px;
+      padding: 13px 0; border-bottom: 1px solid #F4F4F4;
+    }
+    .weight-entry:last-child { border-bottom: none; }
+    .we-name { font-weight: 700; font-size: 0.88rem; min-width: 72px; }
+    .we-input-wrap { flex: 1; position: relative; }
+    .we-input {
+      width: 100%; padding: 10px 38px 10px 12px;
+      border: 2px solid #EEE; border-radius: 10px;
+      font-family: 'Poppins', sans-serif; font-size: 0.92rem; outline: none;
+      transition: border-color 0.2s;
+    }
+    .we-input:focus { border-color: var(--orange); }
+    .we-unit { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--text-light); font-size: 0.78rem; }
+
+    .progress-ring-wrap { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 12px; }
+    .ring-item { text-align: center; }
+    .ring-label { font-size: 0.8rem; font-weight: 700; margin-top: 6px; }
+    .ring-sub { font-size: 0.68rem; color: var(--text-light); }
+
+    /* Leaderboard */
+    .podium {
+      display: flex; align-items: flex-end;
+      justify-content: center; gap: 8px;
+      padding: 16px 6px 8px; margin-bottom: 8px;
+    }
+    .podium-slot { text-align: center; flex: 1; max-width: 110px; }
+    .podium-block {
+      border-radius: 12px 12px 0 0;
+      display: flex; align-items: flex-end;
+      justify-content: center; padding-bottom: 8px;
+      font-size: 1.4rem;
+    }
+    .podium-slot.p1 .podium-block { height: 110px; background: linear-gradient(180deg, #FFD700, #FFA500); }
+    .podium-slot.p2 .podium-block { height: 80px;  background: linear-gradient(180deg, #C8C8C8, #989898); }
+    .podium-slot.p3 .podium-block { height: 60px;  background: linear-gradient(180deg, #CD7F32, #9A5A1A); }
+    .podium-name { font-weight: 700; font-size: 0.82rem; margin-top: 5px; }
+    .podium-pts { font-size: 0.72rem; color: var(--text-light); }
+
+    .rank-row { display: flex; align-items: center; gap: 12px; padding: 13px 0; border-bottom: 1px solid #F4F4F4; }
+    .rank-row:last-child { border-bottom: none; }
+    .rank-pos { font-family: 'Fredoka One', cursive; font-size: 1.4rem; min-width: 28px; text-align: center; }
+    .rank-avatar { font-size: 1.8rem; min-width: 36px; text-align: center; }
+    .rank-info { flex: 1; }
+    .rank-name { font-weight: 700; font-size: 0.92rem; }
+    .rank-sub { font-size: 0.72rem; color: var(--text-light); }
+    .rank-pts { font-family: 'Fredoka One', cursive; font-size: 1.2rem; color: var(--orange); }
+
+    /* Settings */
+    .settings-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid #F4F4F4; }
+    .settings-row:last-child { border-bottom: none; }
+    .settings-name { font-weight: 700; font-size: 0.88rem; min-width: 68px; }
+    .settings-inputs { flex: 1; display: flex; gap: 8px; }
+    .settings-input {
+      flex: 1; padding: 8px 10px; border: 2px solid #EEE;
+      border-radius: 10px; font-family: 'Poppins', sans-serif;
+      font-size: 0.82rem; outline: none; transition: border-color 0.2s;
+    }
+    .settings-input:focus { border-color: var(--orange); }
+    .settings-lbl { font-size: 0.62rem; color: var(--text-light); text-align: center; margin-top: 2px; }
+
+    .pin-change-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid #F4F4F4; }
+    .pin-change-row:last-child { border-bottom: none; }
+    .pin-change-name { font-weight: 700; font-size: 0.88rem; min-width: 68px; }
+    .pin-change-input {
+      flex: 1; padding: 8px 12px; border: 2px solid #EEE;
+      border-radius: 10px; font-family: 'Poppins', sans-serif;
+      font-size: 0.88rem; outline: none; letter-spacing: 4px;
+      transition: border-color 0.2s;
+    }
+    .pin-change-input:focus { border-color: var(--orange); }
+
+    .save-btn {
+      width: 100%; padding: 15px; border: none;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, #FF6B35, #FFD166);
+      color: white; font-family: 'Fredoka One', cursive;
+      font-size: 1.05rem; cursor: pointer; transition: all 0.2s;
+      margin-top: 14px;
+    }
+    .save-btn:hover { transform: scale(1.02); box-shadow: 0 6px 20px rgba(255,107,53,0.35); }
+    .save-btn:active { transform: scale(0.97); }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 88px; left: 50%;
+      transform: translateX(-50%) translateY(16px);
+      background: rgba(30,30,30,0.9); color: white;
+      padding: 11px 22px; border-radius: 24px;
+      font-size: 0.88rem; font-weight: 600;
+      opacity: 0; transition: all 0.3s; z-index: 9000;
+      text-align: center; max-width: 300px; pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* Confetti */
+    .confetti-piece {
+      position: fixed; pointer-events: none; z-index: 9999;
+      border-radius: 2px;
+      animation: confettiFall var(--dur) ease-out forwards;
+    }
+
+    /* Points badge */
+    .pts-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: rgba(255,255,255,0.25); color: white;
+      padding: 4px 10px; border-radius: 12px;
+      font-size: 0.78rem; font-weight: 700;
+    }
+    .week-pts-row {
+      display: flex; gap: 8px; justify-content: center;
+      flex-wrap: wrap; margin-top: 8px;
     }
   </style>
 </head>
 <body>
 
-<!-- Animated background -->
-<div class="blob-wrap">
-  <div class="blob blob-1"></div>
-  <div class="blob blob-2"></div>
-  <div class="blob blob-3"></div>
-</div>
-<div class="floaters" id="floaters"></div>
+<!-- LOGIN SCREEN -->
+<div id="login-screen" class="screen active">
+  <span style="--duration:6s; top:8%; left:8%;" class="float-bg">&#127817;</span>
+  <span style="--duration:8s; top:12%; right:10%;" class="float-bg">&#128170;</span>
+  <span style="--duration:7s; bottom:22%; left:12%;" class="float-bg">&#129347;</span>
+  <span style="--duration:9s; bottom:28%; right:12%;" class="float-bg">&#127939;</span>
+  <span style="--duration:5s; top:38%; left:4%;"  class="float-bg">&#11088;</span>
+  <span style="--duration:6.5s; top:55%; right:5%;" class="float-bg">&#127919;</span>
 
-<!-- Toast -->
+  <div class="login-card">
+    <span class="login-sun">&#9728;&#65039;</span>
+    <div class="login-title">Summer Weight Loss<br>Challenge</div>
+    <p class="login-subtitle">Family Fitness Tracker &#128170;</p>
+
+    <!-- Step 1: Name -->
+    <div id="step-name" class="step active">
+      <p class="name-prompt">Who are you? &#128075;</p>
+      <div class="name-buttons">
+        <button class="name-btn" onclick="selectName('pallavi')">&#127800; Pallavi</button>
+        <button class="name-btn" onclick="selectName('ashwini')">&#127802; Ashwini</button>
+        <button class="name-btn" onclick="selectName('murali')">&#128170; Murali</button>
+      </div>
+    </div>
+
+    <!-- Step 2: PIN -->
+    <div id="step-pin" class="step">
+      <p class="pin-header">Welcome back,</p>
+      <p class="pin-user" id="pin-user-name"></p>
+      <div class="pin-dots" id="pin-dots">
+        <div class="pin-dot" id="dot-0"></div>
+        <div class="pin-dot" id="dot-1"></div>
+        <div class="pin-dot" id="dot-2"></div>
+        <div class="pin-dot" id="dot-3"></div>
+      </div>
+      <div class="pin-grid">
+        <button class="pin-key" onclick="pinKey('1')">1</button>
+        <button class="pin-key" onclick="pinKey('2')">2</button>
+        <button class="pin-key" onclick="pinKey('3')">3</button>
+        <button class="pin-key" onclick="pinKey('4')">4</button>
+        <button class="pin-key" onclick="pinKey('5')">5</button>
+        <button class="pin-key" onclick="pinKey('6')">6</button>
+        <button class="pin-key" onclick="pinKey('7')">7</button>
+        <button class="pin-key" onclick="pinKey('8')">8</button>
+        <button class="pin-key" onclick="pinKey('9')">9</button>
+        <button class="pin-key empty" disabled></button>
+        <button class="pin-key" onclick="pinKey('0')">0</button>
+        <button class="pin-key delete" onclick="pinDelete()">&#9003;</button>
+      </div>
+      <p class="pin-error" id="pin-error"></p>
+      <button class="back-btn" onclick="backToNames()">&larr; Change name</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app" class="screen">
+
+  <div class="app-header">
+    <div class="floating-emojis" id="header-emojis"></div>
+    <div class="header-top">
+      <div class="user-chip" id="user-chip">&#128100; ...</div>
+      <button class="logout-btn" onclick="logout()">Log out</button>
+    </div>
+    <div class="app-title">&#9728;&#65039; Summer Weight Loss Challenge</div>
+    <div class="week-pts-row" id="week-pts-row"></div>
+  </div>
+
+  <nav class="bottom-nav">
+    <button class="bn-item active" onclick="switchTab('today',this)">
+      <span class="bn-icon">&#127968;</span>Today
+    </button>
+    <button class="bn-item" onclick="switchTab('weekly',this)">
+      <span class="bn-icon">&#9878;&#65039;</span>Weekly
+    </button>
+    <button class="bn-item" onclick="switchTab('board',this)">
+      <span class="bn-icon">&#127942;</span>Board
+    </button>
+    <button class="bn-item" onclick="switchTab('settings',this)">
+      <span class="bn-icon">&#9881;&#65039;</span>Settings
+    </button>
+  </nav>
+
+  <!-- TODAY -->
+  <div id="tab-today" class="tab-content active">
+    <p class="today-date" id="today-date"></p>
+    <p class="today-greeting" id="today-greeting"></p>
+
+    <div class="motivation-card">
+      <span class="motivation-emoji" id="mot-emoji"></span>
+      <div class="motivation-quote" id="mot-quote"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">&#127919; My Daily Check-in</div>
+      <div id="streak-area"></div>
+      <p class="checkin-label" id="checkin-label">How are your calories today?</p>
+      <div class="rag-buttons" id="rag-buttons">
+        <button class="rag-btn green-btn" onclick="logRag('green')">
+          <span class="rag-emoji">&#129001;</span>On target!
+        </button>
+        <button class="rag-btn amber-btn" onclick="logRag('amber')">
+          <span class="rag-emoji">&#129000;</span>Nearly there
+        </button>
+        <button class="rag-btn red-btn" onclick="logRag('red')">
+          <span class="rag-emoji">&#128997;</span>Over budget
+        </button>
+      </div>
+      <div id="logged-note" class="logged-note"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">&#128106; Family Today</div>
+      <div class="family-row" id="family-today"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">&#128197; This Week</div>
+      <div class="week-strip" id="week-strip"></div>
+    </div>
+  </div>
+
+  <!-- WEEKLY -->
+  <div id="tab-weekly" class="tab-content">
+    <div class="card" style="margin-top:16px;">
+      <div class="card-title">&#9878;&#65039; This Week's Weigh-in</div>
+      <p style="font-size:0.78rem;color:var(--text-light);margin-bottom:14px;" id="week-label"></p>
+      <div id="weigh-in-entries"></div>
+      <button class="save-btn" onclick="saveWeighIn()">&#128190; Save Weights</button>
+    </div>
+    <div class="card">
+      <div class="card-title">&#128200; Weight Progress</div>
+      <div class="progress-ring-wrap" id="progress-rings"></div>
+    </div>
+  </div>
+
+  <!-- LEADERBOARD -->
+  <div id="tab-board" class="tab-content">
+    <div class="card" style="margin-top:16px;">
+      <div class="card-title">&#127942; This Week's Podium</div>
+      <div class="podium" id="podium"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">&#128202; All-time Rankings</div>
+      <div id="rank-list"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">&#128197; Last 4 Weeks</div>
+      <div id="history-grid"></div>
+    </div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div id="tab-settings" class="tab-content">
+    <div class="card" style="margin-top:16px;">
+      <div class="card-title">&#9878;&#65039; Weight Targets</div>
+      <p style="font-size:0.78rem;color:var(--text-light);margin-bottom:14px;">Set each participant's starting and target weight.</p>
+      <div id="weight-settings"></div>
+      <button class="save-btn" onclick="saveSettings()">&#128190; Save Settings</button>
+    </div>
+    <div class="card">
+      <div class="card-title">&#128272; Change PINs</div>
+      <p style="font-size:0.78rem;color:var(--text-light);margin-bottom:14px;">Enter a new 4-digit PIN. Leave blank to keep current.</p>
+      <div id="pin-settings"></div>
+      <button class="save-btn" onclick="savePins()">&#128272; Save PINs</button>
+    </div>
+  </div>
+
+</div>
+
 <div class="toast" id="toast"></div>
 
-<!-- Setup / Settings modal -->
-<div class="modal-overlay hidden" id="settingsModal">
-  <div class="modal">
-    <h2>⚙️ Challenge Setup</h2>
-    <p>Set start weight and target weight for each participant (in kg or lbs — just be consistent!)</p>
-
-    <div class="modal-person">
-      <div class="modal-person-name">🌸 Pallavi</div>
-      <div class="modal-field">
-        <label>Start weight</label>
-        <input class="modal-input" type="number" step="0.1" id="s-pallavi-start" placeholder="e.g. 72.0" />
-      </div>
-      <div class="modal-field">
-        <label>Target weight</label>
-        <input class="modal-input" type="number" step="0.1" id="s-pallavi-target" placeholder="e.g. 65.0" />
-      </div>
-    </div>
-
-    <div class="modal-person">
-      <div class="modal-person-name">🌺 Ashwini</div>
-      <div class="modal-field">
-        <label>Start weight</label>
-        <input class="modal-input" type="number" step="0.1" id="s-ashwini-start" placeholder="e.g. 68.0" />
-      </div>
-      <div class="modal-field">
-        <label>Target weight</label>
-        <input class="modal-input" type="number" step="0.1" id="s-ashwini-target" placeholder="e.g. 62.0" />
-      </div>
-    </div>
-
-    <div class="modal-person">
-      <div class="modal-person-name">🦁 Murali</div>
-      <div class="modal-field">
-        <label>Start weight</label>
-        <input class="modal-input" type="number" step="0.1" id="s-murali-start" placeholder="e.g. 85.0" />
-      </div>
-      <div class="modal-field">
-        <label>Target weight</label>
-        <input class="modal-input" type="number" step="0.1" id="s-murali-target" placeholder="e.g. 78.0" />
-      </div>
-    </div>
-
-    <button class="modal-save-btn" id="modalSaveBtn">🚀 Start the Challenge!</button>
-  </div>
-</div>
-
-<!-- Main app -->
-<div id="app">
-
-  <!-- Header -->
-  <div class="header">
-    <div class="header-sun">☀️</div>
-    <h1>Summer Weight Loss<br>Challenge</h1>
-    <p id="dateDisplay"></p>
-  </div>
-
-  <!-- Daily quote -->
-  <div class="quote-bar" id="quoteBar"></div>
-
-  <!-- Today's check-in -->
-  <div class="section-title">🥗 Today's Check-In</div>
-  <div id="checkinSection"></div>
-
-  <!-- This week strip -->
-  <div class="section-title">📅 This Week</div>
-  <div class="week-strip-card" id="weekStrip"></div>
-
-  <!-- Leaderboard -->
-  <div class="section-title">🏆 Leaderboard</div>
-  <div class="leaderboard-card" id="leaderboard"></div>
-
-  <!-- Weekly weight -->
-  <div class="section-title">⚖️ Weekly Weigh-In</div>
-  <div class="weight-card" id="weightSection"></div>
-
-  <!-- Settings -->
-  <button class="settings-btn" id="openSettings">⚙️ Edit Setup / Targets</button>
-
-  <div class="footer">Summer 2026 · Stay strong, family! 💪</div>
-</div>
-
 <script>
-// ─── CONSTANTS ─────────────────────────────────────────────────
-const PEOPLE = [
+const MEMBERS = [
   { id: 'pallavi', name: 'Pallavi', emoji: '🌸' },
   { id: 'ashwini', name: 'Ashwini', emoji: '🌺' },
-  { id: 'murali',  name: 'Murali',  emoji: '🦁' }
+  { id: 'murali',  name: 'Murali',  emoji: '💪' }
 ];
+
+const DATA_KEY    = 'swlc_v1';
+const PINS_KEY    = 'swlc_pins';
+const SESSION_KEY = 'swlc_session';
+const DEFAULT_PINS = { pallavi: '1111', ashwini: '2222', murali: '3333' };
 
 const QUOTES = [
-  '💪 Every green day is a step closer to your goal!',
-  '🌟 Progress, not perfection. Keep going!',
-  '🥗 You are what you eat — make it count today!',
-  '🔥 Consistency beats intensity every time.',
-  '🌈 Small steps every day lead to big changes.',
-  '🏃 The only bad workout is the one that didn\'t happen.',
-  '🍉 Summer bodies are made in spring — and today!',
-  '⭐ You\'ve got this, family! Support each other!',
-  '🌿 Nourish your body, love yourself.',
-  '🎯 Stay focused. Your future self will thank you.',
-  '🌊 Ride the wave of momentum!',
-  '🦋 Transformation takes time — trust the process.',
+  { e:'🌅', t:'Every sunrise brings a new chance to make healthier choices.' },
+  { e:'💪', t:'Small steps every day lead to big results. Keep going!' },
+  { e:'🌟', t:'You are stronger than any craving. Believe it!' },
+  { e:'🏃', t:'The only bad workout is the one that didn\'t happen.' },
+  { e:'🥗', t:'Feed your goals, not your stress. Make it count today!' },
+  { e:'🔥', t:'Consistency is the secret ingredient. You\'ve got this!' },
+  { e:'🎯', t:'Focus on progress, not perfection. Every green day wins!' },
+  { e:'🌈', t:'Healthy habits are self-love in action.' },
+  { e:'⚡',        t:'Challenge accepted. Now go smash those goals!' },
+  { e:'🏆', t:'Champions are made in the moments they want to quit but don\'t.' },
+  { e:'🥦', t:'Your body is doing amazing things. Fuel it well today.' },
+  { e:'🙏', t:'Be patient with yourself — great things take time.' }
 ];
 
-const MESSAGES = {
-  green: ['🎉 Amazing! Crushed it today!', '🌟 Green day — you\'re on fire!', '💚 Perfect! Keep that streak going!', '🥗 Healthy choices = healthy body!'],
-  amber: ['👍 Good effort! Aim for green tomorrow!', '🌤️ Almost there — little more focus!', '💛 Amber today, green tomorrow!'],
-  red: ['❤️ Tomorrow is a fresh start!', '💪 Don\'t give up — every day is new!', '🌱 Acknowledge, reset, come back stronger!'],
-};
-
-// ─── DATA LAYER ─────────────────────────────────────────────────
-const STORE_KEY = 'swlc_data';
+function loadPins() {
+  const s = localStorage.getItem(PINS_KEY);
+  return s ? JSON.parse(s) : { ...DEFAULT_PINS };
+}
+function storePins(p) { localStorage.setItem(PINS_KEY, JSON.stringify(p)); }
 
 function loadData() {
-  try {
-    const raw = localStorage.getItem(STORE_KEY);
-    if (raw) return JSON.parse(raw);
-  } catch(e) {}
+  const s = localStorage.getItem(DATA_KEY);
+  if (s) return JSON.parse(s);
   return {
     settings: {
       pallavi: { startWeight: null, targetWeight: null },
       ashwini: { startWeight: null, targetWeight: null },
       murali:  { startWeight: null, targetWeight: null }
     },
-    daily: {},
-    weekly: {}
+    daily: {}, weekly: {}
   };
 }
+function saveData() { localStorage.setItem(DATA_KEY, JSON.stringify(appData)); }
 
-function saveData(data) {
-  localStorage.setItem(STORE_KEY, JSON.stringify(data));
+let appData = loadData();
+let currentUser = sessionStorage.getItem(SESSION_KEY);
+let pinBuffer = '';
+let loginName = '';
+
+function todayKey() { return new Date().toISOString().split('T')[0]; }
+
+function weekKey(d) {
+  const dt = d ? new Date(d) : new Date();
+  const doy = Math.floor((dt - new Date(dt.getFullYear(),0,0)) / 86400000);
+  return dt.getFullYear() + '-W' + String(Math.ceil((doy + 1) / 7)).padStart(2,'0');
 }
 
-let DATA = loadData();
-
-// ─── DATE UTILITIES ─────────────────────────────────────────────
-function todayStr() {
-  return new Date().toISOString().slice(0, 10);
-}
-
-function weekKey(date) {
-  const d = date ? new Date(date) : new Date();
-  const jan1 = new Date(d.getFullYear(), 0, 1);
-  const week = Math.ceil(((d - jan1) / 86400000 + jan1.getDay() + 1) / 7);
-  return `${d.getFullYear()}-W${String(week).padStart(2, '0')}`;
-}
-
-function getWeekDays() {
+function getWeekDates() {
   const today = new Date();
-  const dow = today.getDay(); // 0=Sun
-  const monday = new Date(today);
-  monday.setDate(today.getDate() - ((dow + 6) % 7));
-  const days = [];
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(monday);
-    d.setDate(monday.getDate() + i);
-    days.push(d.toISOString().slice(0, 10));
+  const day = today.getDay();
+  const mon = new Date(today);
+  mon.setDate(today.getDate() - (day === 0 ? 6 : day - 1));
+  return Array.from({length:7}, (_,i) => {
+    const d = new Date(mon); d.setDate(mon.getDate()+i);
+    return d.toISOString().split('T')[0];
+  });
+}
+
+const DAY_LABELS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+function memberInfo(id) { return MEMBERS.find(m => m.id === id); }
+
+function calcStreak(id) {
+  let streak = 0;
+  const d = new Date(); d.setDate(d.getDate()-1);
+  for (let i = 0; i < 90; i++) {
+    const k = d.toISOString().split('T')[0];
+    if (appData.daily[k]?.[id] === 'green') { streak++; d.setDate(d.getDate()-1); }
+    else break;
   }
-  return days;
+  if (appData.daily[todayKey()]?.[id] === 'green') streak++;
+  return streak;
 }
 
-function formatDate(dateStr) {
-  const d = new Date(dateStr + 'T12:00:00');
-  return d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
-}
-
-function dayLabel(dateStr) {
-  const d = new Date(dateStr + 'T12:00:00');
-  return d.toLocaleDateString('en-GB', { weekday: 'short' }).slice(0, 2);
-}
-
-// ─── SCORING ────────────────────────────────────────────────────
-const RAG_PTS = { green: 3, amber: 1, red: 0 };
-
-function totalPoints(personId) {
+function calcPoints(id, weekOnly) {
+  const wk = weekKey();
   let pts = 0;
-  for (const dayData of Object.values(DATA.daily)) {
-    const status = dayData[personId];
-    if (status) pts += RAG_PTS[status] || 0;
-  }
-  const settings = DATA.settings[personId];
-  if (settings && settings.startWeight && settings.targetWeight) {
-    for (const weekData of Object.values(DATA.weekly)) {
-      const w = weekData[personId];
-      if (w != null) {
-        const totalLoss = settings.startWeight - settings.targetWeight;
-        const achieved = settings.startWeight - w;
-        if (achieved >= totalLoss * 0.25) pts += 5;
-      }
-    }
+  Object.entries(appData.daily).forEach(([date, day]) => {
+    if (weekOnly && weekKey(date) !== wk) return;
+    const v = day[id];
+    if (v === 'green') pts += 3;
+    else if (v === 'amber') pts += 1;
+  });
+  if (weekOnly) {
+    const w = appData.weekly[wk];
+    const s = appData.settings[id];
+    if (w?.[id] && s?.targetWeight && parseFloat(w[id]) <= parseFloat(s.targetWeight)) pts += 5;
   }
   return pts;
 }
 
-function currentStreak(personId) {
-  const today = todayStr();
-  let streak = 0;
-  let d = new Date();
-  while (true) {
-    const key = d.toISOString().slice(0, 10);
-    if (key > today) { d.setDate(d.getDate() - 1); continue; }
-    const status = (DATA.daily[key] || {})[personId];
-    if (status === 'green') {
-      streak++;
-      d.setDate(d.getDate() - 1);
-    } else {
-      break;
-    }
-    if (streak > 365) break;
-  }
-  return streak;
+function selectName(name) {
+  loginName = name;
+  const m = memberInfo(name);
+  document.getElementById('pin-user-name').textContent = m.emoji + ' ' + m.name;
+  document.getElementById('step-name').classList.remove('active');
+  document.getElementById('step-pin').classList.add('active');
+  pinBuffer = ''; updatePinDots();
+  document.getElementById('pin-error').textContent = '';
 }
 
-// ─── RENDER HELPERS ─────────────────────────────────────────────
-function randChoice(arr) {
-  return arr[Math.floor(Math.random() * arr.length)];
+function backToNames() {
+  document.getElementById('step-pin').classList.remove('active');
+  document.getElementById('step-name').classList.add('active');
+  loginName = ''; pinBuffer = '';
+  document.getElementById('pin-error').textContent = '';
 }
 
-function weightProgress(personId) {
-  const s = DATA.settings[personId];
-  if (!s || !s.startWeight || !s.targetWeight) return { pct: 0, current: null, start: s?.startWeight, target: s?.targetWeight };
-  const weeks = Object.keys(DATA.weekly).sort().reverse();
-  let current = null;
-  for (const w of weeks) {
-    if (DATA.weekly[w][personId] != null) { current = DATA.weekly[w][personId]; break; }
-  }
-  if (!current) current = s.startWeight;
-  const totalLoss = s.startWeight - s.targetWeight;
-  if (totalLoss <= 0) return { pct: 100, current, start: s.startWeight, target: s.targetWeight };
-  const achieved = s.startWeight - current;
-  const pct = Math.min(100, Math.max(0, Math.round((achieved / totalLoss) * 100)));
-  return { pct, current, start: s.startWeight, target: s.targetWeight };
+function pinKey(digit) {
+  if (pinBuffer.length >= 4) return;
+  pinBuffer += digit;
+  updatePinDots();
+  document.getElementById('pin-error').textContent = '';
+  if (pinBuffer.length === 4) setTimeout(checkPin, 200);
 }
 
-// ─── RENDER FUNCTIONS ───────────────────────────────────────────
+function pinDelete() {
+  pinBuffer = pinBuffer.slice(0, -1);
+  updatePinDots();
+}
 
-function renderCheckin() {
-  const today = todayStr();
-  const todayData = DATA.daily[today] || {};
-  let html = '';
+function updatePinDots() {
+  for (let i = 0; i < 4; i++)
+    document.getElementById('dot-'+i).classList.toggle('filled', i < pinBuffer.length);
+}
 
-  for (const p of PEOPLE) {
-    const status = todayData[p.id];
-    const streak = currentStreak(p.id);
-    const pts = totalPoints(p.id);
-    const done = !!status;
-
-    let ragHtml = '';
-    if (done) {
-      ragHtml = `<div class="done-banner">✅ Logged as <strong>${status.charAt(0).toUpperCase() + status.slice(1)}</strong> today!</div>`;
-    } else {
-      const btns = ['green','amber','red'].map(r => {
-        const icons = { green: '🟢', amber: '🟡', red: '🔴' };
-        const labels = { green: 'On track', amber: 'Okay-ish', red: 'Struggled' };
-        return `<button class="rag-btn ${r}" data-person="${p.id}" data-status="${r}" onclick="logRag('${p.id}','${r}')">
-          <span class="rag-icon">${icons[r]}</span>${labels[r]}
-        </button>`;
-      }).join('');
-      ragHtml = `<div class="rag-buttons">${btns}</div>`;
-    }
-
-    const streakClass = streak >= 3 ? 'streak-badge on-fire' : 'streak-badge';
-    const streakText = streak >= 3 ? `🔥 ${streak} day streak!` : streak > 0 ? `🔥 ${streak}` : '—';
-
-    html += `<div class="person-card">
-      <div class="person-header">
-        <div class="person-info">
-          <div class="person-avatar">${p.emoji}</div>
-          <div>
-            <div class="person-name">${p.name}</div>
-            <div class="person-pts">⭐ ${pts} pts total</div>
-          </div>
-        </div>
-        <div class="${streakClass}">${streakText}</div>
-      </div>
-      ${ragHtml}
-      <div class="feedback-msg" id="feedback-${p.id}"></div>
-    </div>`;
+function checkPin() {
+  const pins = loadPins();
+  if (pins[loginName] === pinBuffer) {
+    sessionStorage.setItem(SESSION_KEY, loginName);
+    currentUser = loginName;
+    showApp();
+  } else {
+    document.getElementById('pin-error').textContent = '❌ Incorrect PIN. Try again.';
+    const pd = document.getElementById('pin-dots');
+    pd.style.animation = 'shake 0.5s ease';
+    setTimeout(() => { pd.style.animation = ''; pinBuffer = ''; updatePinDots(); }, 600);
   }
+}
 
-  document.getElementById('checkinSection').innerHTML = html;
+function logout() {
+  sessionStorage.removeItem(SESSION_KEY);
+  currentUser = null;
+  document.getElementById('app').classList.remove('active');
+  document.getElementById('login-screen').classList.add('active');
+  document.getElementById('step-pin').classList.remove('active');
+  document.getElementById('step-name').classList.add('active');
+  pinBuffer = ''; loginName = '';
+}
+
+function showApp() {
+  document.getElementById('login-screen').classList.remove('active');
+  document.getElementById('app').classList.add('active');
+  switchTab('today', document.querySelector('.bn-item'));
+  initApp();
+}
+
+function initApp() {
+  const m = memberInfo(currentUser);
+  document.getElementById('user-chip').textContent = m.emoji + ' ' + m.name;
+  const container = document.getElementById('header-emojis');
+  container.innerHTML = '';
+  ['🍉','💪','🥗','🏃','⭐','🔥','🥦','🎯'].forEach((e,i) => {
+    const s = document.createElement('span');
+    s.className = 'fe'; s.textContent = e;
+    s.style.cssText = `left:${8+i*12}%;top:${15+(i%3)*20}%;--d:${5+i}s;--delay:${i*0.4}s;`;
+    container.appendChild(s);
+  });
+  const wkPts = MEMBERS.map(mm => ({ ...mm, pts: calcPoints(mm.id, true) }));
+  document.getElementById('week-pts-row').innerHTML = wkPts.map(mm =>
+    `<div class="pts-badge">${mm.emoji} ${mm.name.split(' ')[0]} ${mm.pts}pts</div>`
+  ).join('');
+  renderToday();
+  if (!appData.settings[currentUser]?.startWeight || !appData.settings[currentUser]?.targetWeight)
+    showToast('⚙️ Tip: Set your weight targets in Settings!');
+}
+
+function renderToday() {
+  const today = new Date();
+  document.getElementById('today-date').textContent =
+    today.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long' });
+  const m = memberInfo(currentUser);
+  const h = today.getHours();
+  const greet = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+  document.getElementById('today-greeting').textContent = `${greet}, ${m.name}! ${m.emoji}`;
+  const doy = Math.floor((today - new Date(today.getFullYear(),0,0)) / 86400000);
+  const q = QUOTES[doy % QUOTES.length];
+  document.getElementById('mot-emoji').textContent = q.e;
+  document.getElementById('mot-quote').textContent = q.t;
+  const streak = calcStreak(currentUser);
+  document.getElementById('streak-area').innerHTML = streak >= 2
+    ? `<div class="streak-badge"><span class="flame-icon">🔥</span>${streak} day streak!</div>`
+    : '';
+  const tk = todayKey();
+  const myStatus = appData.daily[tk]?.[currentUser];
+  document.getElementById('checkin-label').textContent = myStatus ? 'Logged today:' : 'How are your calories today?';
+  document.getElementById('logged-note').textContent = myStatus ? '✔ Tap a button to change your log' : '';
+  const ragBtns = document.getElementById('rag-buttons').querySelectorAll('.rag-btn');
+  ragBtns.forEach(b => b.classList.remove('selected'));
+  if (myStatus) { const sel = document.querySelector(`.${myStatus}-btn`); if (sel) sel.classList.add('selected'); }
+  const todayLog = appData.daily[tk] || {};
+  const icons = { green:'✓', amber:'~', red:'✗', none:'?' };
+  document.getElementById('family-today').innerHTML = MEMBERS.map(mm => {
+    const st = todayLog[mm.id] || 'none';
+    return `<div class="member-card-sm"><div class="member-name-sm">${mm.emoji} ${mm.name.slice(0,7)}</div><div class="rag-circle ${st}">${icons[st]}</div><div class="rag-circle-label">${st === 'none' ? 'Not yet' : st}</div></div>`;
+  }).join('');
+  renderWeekStrip();
 }
 
 function renderWeekStrip() {
-  const days = getWeekDays();
-  const today = todayStr();
-  let html = '';
-
-  for (const p of PEOPLE) {
-    const daysHtml = days.map(d => {
-      const status = (DATA.daily[d] || {})[p.id];
-      const isToday = d === today;
-      let cls = 'strip-day';
-      if (status) cls += ` ${status}`;
-      if (isToday) cls += ' today';
-      return `<div class="${cls}" title="${d}">${dayLabel(d)}</div>`;
+  const days = getWeekDates();
+  const tk = todayKey();
+  document.getElementById('week-strip').innerHTML = days.map((d,i) => {
+    const log = appData.daily[d] || {};
+    const isToday = d === tk;
+    const isFuture = d > tk;
+    const dots = MEMBERS.map(mm => {
+      const st = isFuture ? 'future' : (log[mm.id] || 'none');
+      const ring = isToday ? ' today-ring' : '';
+      return `<div class="day-dot ${st}${ring}">${st==='green'?'✓':st==='amber'?'~':st==='red'?'✗':isFuture?'':''}</div>`;
     }).join('');
-    html += `<div class="week-strip-person">
-      <div class="strip-label">${p.emoji} ${p.name}</div>
-      <div class="strip-days">${daysHtml}</div>
-    </div>`;
-  }
+    return `<div class="day-cell"><div class="day-label" style="${isToday?'color:var(--orange);font-weight:800;':''}">${DAY_LABELS[i]}</div>${dots}</div>`;
+  }).join('');
+}
 
-  document.getElementById('weekStrip').innerHTML = html;
+function logRag(status) {
+  const tk = todayKey();
+  if (!appData.daily[tk]) appData.daily[tk] = {};
+  appData.daily[tk][currentUser] = status;
+  saveData();
+  if (status === 'green') { launchConfetti(); showToast('🎉 Green day! +3 points! You rock!'); }
+  else if (status === 'amber') showToast('🟡 Good effort! +1pt. Push a little harder tomorrow!');
+  else showToast('💪 Over budget today — fresh start tomorrow!');
+  renderToday();
+  const wkPts = MEMBERS.map(mm => ({ ...mm, pts: calcPoints(mm.id, true) }));
+  document.getElementById('week-pts-row').innerHTML = wkPts.map(mm =>
+    `<div class="pts-badge">${mm.emoji} ${mm.name.split(' ')[0]} ${mm.pts}pts</div>`
+  ).join('');
+}
+
+function renderWeekly() {
+  const wk = weekKey();
+  document.getElementById('week-label').textContent = `Week ${wk} — Enter weights below`;
+  const wData = appData.weekly[wk] || {};
+  document.getElementById('weigh-in-entries').innerHTML = MEMBERS.map(m => `
+    <div class="weight-entry">
+      <span class="we-name">${m.emoji} ${m.name}</span>
+      <div class="we-input-wrap">
+        <input class="we-input" type="number" step="0.1" min="30" max="300"
+          id="wi-${m.id}" placeholder="e.g. 72.5" value="${wData[m.id] || ''}">
+        <span class="we-unit">kg</span>
+      </div>
+    </div>`).join('');
+  renderProgressRings();
+}
+
+function saveWeighIn() {
+  const wk = weekKey();
+  if (!appData.weekly[wk]) appData.weekly[wk] = {};
+  let saved = false;
+  MEMBERS.forEach(m => {
+    const v = document.getElementById('wi-'+m.id)?.value;
+    if (v && !isNaN(v) && parseFloat(v) > 0) { appData.weekly[wk][m.id] = parseFloat(v); saved = true; }
+  });
+  if (saved) { saveData(); renderProgressRings(); confettiSmall(); showToast('✅ Weights saved! Great progress!'); }
+  else showToast('⚠️ Enter at least one weight.');
+}
+
+function renderProgressRings() {
+  document.getElementById('progress-rings').innerHTML = MEMBERS.map(m => {
+    const s = appData.settings[m.id] || {};
+    const start = parseFloat(s.startWeight), target = parseFloat(s.targetWeight);
+    let latest = null;
+    for (const wk of Object.keys(appData.weekly).sort().reverse())
+      if (appData.weekly[wk][m.id]) { latest = appData.weekly[wk][m.id]; break; }
+    let pct = 0, lbl = latest ? latest+'kg' : 'No data', sub = target ? 'Target: '+target+'kg' : 'No target';
+    if (start && target && latest) {
+      const totalLoss = start - target;
+      pct = totalLoss > 0 ? Math.min(100, Math.max(0, ((start-latest)/totalLoss)*100)) : 0;
+    }
+    const r = 42, circ = 2*Math.PI*r, dash = circ - (pct/100)*circ;
+    const col = pct >= 80 ? '#06D6A0' : pct >= 40 ? '#FFD166' : '#FF6B35';
+    return `<div class="ring-item"><svg width="96" height="96" viewBox="0 0 96 96"><circle cx="48" cy="48" r="${r}" fill="none" stroke="#F0F0F0" stroke-width="8"/><circle cx="48" cy="48" r="${r}" fill="none" stroke="${col}" stroke-width="8" stroke-linecap="round" stroke-dasharray="${circ.toFixed(1)}" stroke-dashoffset="${dash.toFixed(1)}" transform="rotate(-90 48 48)" style="transition:stroke-dashoffset 1s ease;"/><text x="48" y="44" text-anchor="middle" font-size="10" font-weight="700" fill="#2D2D2D" font-family="Poppins">${lbl}</text><text x="48" y="58" text-anchor="middle" font-size="9" fill="#999" font-family="Poppins">${Math.round(pct)}%</text></svg><div class="ring-label">${m.emoji} ${m.name}</div><div class="ring-sub">${sub}</div></div>`;
+  }).join('');
 }
 
 function renderLeaderboard() {
-  const ranked = PEOPLE.map(p => ({ ...p, pts: totalPoints(p.id), streak: currentStreak(p.id) }))
-    .sort((a, b) => b.pts - a.pts);
-
-  const medals = ['🥇', '🥈', '🥉'];
-  const podiumOrder = [ranked[1], ranked[0], ranked[2]];
-  const podiumClass = ['p2', 'p1', 'p3'];
-
-  const podiumHtml = podiumOrder.map((p, i) => {
-    if (!p) return '';
-    const rank = ranked.indexOf(p);
-    return `<div class="podium-slot">
-      <div class="podium-avatar">${p.emoji}</div>
-      <div class="podium-name">${p.name}</div>
-      <div class="podium-pts">${p.pts} pts</div>
-      <div class="podium-block ${podiumClass[i]}">${medals[rank]}</div>
-    </div>`;
+  const weekPts = MEMBERS.map(m => ({ ...m, wPts: calcPoints(m.id,true), tPts: calcPoints(m.id,false), streak: calcStreak(m.id) }));
+  weekPts.sort((a,b) => b.wPts - a.wPts);
+  const po = weekPts.length >= 3 ? [weekPts[1], weekPts[0], weekPts[2]] : weekPts;
+  const pClass = ['p2','p1','p3'], pMedal = ['🥈','🥇','🥉'];
+  document.getElementById('podium').innerHTML = po.map((m,i) =>
+    `<div class="podium-slot ${pClass[i]}"><div style="font-size:1.8rem;margin-bottom:4px;">${m.emoji}</div><div class="podium-block">${pMedal[i]}</div><div class="podium-name">${m.name}</div><div class="podium-pts">${m.wPts} pts</div></div>`
+  ).join('');
+  const allTime = MEMBERS.map(m => ({ ...m, tPts: calcPoints(m.id,false), streak: calcStreak(m.id) }));
+  allTime.sort((a,b) => b.tPts - a.tPts);
+  const medals = ['🥇','🥈','🥉'];
+  document.getElementById('rank-list').innerHTML = allTime.map((m,i) =>
+    `<div class="rank-row"><div class="rank-pos">${medals[i]||i+1}</div><div class="rank-avatar">${m.emoji}</div><div class="rank-info"><div class="rank-name">${m.name}${m.streak>=2?' 🔥'+m.streak:''}</div><div class="rank-sub">This week: ${calcPoints(m.id,true)} pts</div></div><div class="rank-pts">${m.tPts} pts</div></div>`
+  ).join('');
+  const today = new Date(), tk = todayKey();
+  const weeks = [];
+  for (let w = 3; w >= 0; w--) {
+    const d = new Date(today); d.setDate(today.getDate()-w*7);
+    const day = d.getDay(), mon = new Date(d); mon.setDate(d.getDate()-(day===0?6:day-1));
+    weeks.push(Array.from({length:7},(_,i)=>{ const dd=new Date(mon); dd.setDate(mon.getDate()+i); return dd.toISOString().split('T')[0]; }));
+  }
+  const cols = ['#06D6A0','#FFD166','#EF476F','#E8E8E8'];
+  document.getElementById('history-grid').innerHTML = weeks.map(days => {
+    const lbl = new Date(days[0]).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+    const rows = MEMBERS.map(m => {
+      const dots = days.map(d => {
+        const st = appData.daily[d]?.[m.id];
+        const isFut = d > tk;
+        const bg = isFut?'#F4F4F4':st==='green'?cols[0]:st==='amber'?cols[1]:st==='red'?cols[2]:cols[3];
+        return `<div style="width:22px;height:22px;border-radius:50%;background:${bg};display:inline-block;margin:1px;"></div>`;
+      }).join('');
+      return `<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;"><span style="font-size:0.72rem;min-width:56px;font-weight:600;">${m.emoji} ${m.name.slice(0,6)}</span><div style="display:flex;gap:2px;">${dots}</div></div>`;
+    }).join('');
+    return `<div style="margin-bottom:14px;"><div style="font-size:0.72rem;font-weight:700;color:var(--orange);margin-bottom:6px;">Week of ${lbl}</div>${rows}</div>`;
   }).join('');
-
-  document.getElementById('leaderboard').innerHTML = `<div class="podium">${podiumHtml}</div>`;
 }
 
-function renderWeightSection() {
-  const wk = weekKey();
-  const weeklyData = DATA.weekly[wk] || {};
-  let html = '';
-
-  for (const p of PEOPLE) {
-    const prog = weightProgress(p.id);
-    const currentWeekVal = weeklyData[p.id] != null ? weeklyData[p.id] : '';
-    const startLabel = prog.start ? `Start: ${prog.start}` : 'Start: ?';
-    const targetLabel = prog.target ? `Target: ${prog.target}` : 'Target: ?';
-
-    html += `<div class="weight-person">
-      <div class="weight-person-header">
-        <div class="weight-name">${p.emoji} ${p.name}</div>
-        <div class="weight-target">${prog.pct}% to goal</div>
-      </div>
-      <div class="progress-track">
-        <div class="progress-fill" id="prog-${p.id}" style="width:${prog.pct}%"></div>
-      </div>
-      <div class="progress-labels">
-        <span>${startLabel}</span>
-        <span>${targetLabel}</span>
-      </div>
-      <div class="weight-input-row">
-        <input class="weight-input" type="number" step="0.1" id="w-${p.id}"
-          value="${currentWeekVal}" placeholder="This week's weight" />
-        <button class="weight-save-btn" onclick="saveWeight('${p.id}')">Save ⚖️</button>
-      </div>
-    </div>`;
-  }
-
-  document.getElementById('weightSection').innerHTML = html;
-}
-
-// ─── ACTIONS ────────────────────────────────────────────────────
-
-function logRag(personId, status) {
-  const today = todayStr();
-  if (!DATA.daily[today]) DATA.daily[today] = {};
-  const prev = DATA.daily[today][personId];
-  if (prev) return;
-  DATA.daily[today][personId] = status;
-  saveData(DATA);
-
-  if (status === 'green') fireConfetti();
-  const msg = randChoice(MESSAGES[status]);
-  const el = document.getElementById(`feedback-${personId}`);
-  if (el) { el.textContent = msg; }
-
-  showToast(msg);
-  renderCheckin();
-  renderWeekStrip();
-  renderLeaderboard();
-}
-
-function saveWeight(personId) {
-  const input = document.getElementById(`w-${personId}`);
-  const val = parseFloat(input.value);
-  if (isNaN(val) || val <= 0) { showToast('⚠️ Please enter a valid weight'); return; }
-
-  const wk = weekKey();
-  if (!DATA.weekly[wk]) DATA.weekly[wk] = {};
-  const prev = DATA.weekly[wk][personId];
-  DATA.weekly[wk][personId] = val;
-  saveData(DATA);
-
-  const s = DATA.settings[personId];
-  if (s && s.targetWeight && val <= s.targetWeight) {
-    fireConfetti();
-    showToast('🎉 TARGET REACHED! Incredible!!!');
-  } else if (prev && val < prev) {
-    showToast(`📉 Down ${(prev - val).toFixed(1)} from last week — keep going!`);
-  } else {
-    showToast('⚖️ Weight logged!');
-  }
-
-  renderWeightSection();
-  renderLeaderboard();
-}
-
-// ─── SETTINGS MODAL ─────────────────────────────────────────────
-
-function openSettings() {
-  for (const p of PEOPLE) {
-    const s = DATA.settings[p.id];
-    if (s.startWeight)  document.getElementById(`s-${p.id}-start`).value  = s.startWeight;
-    if (s.targetWeight) document.getElementById(`s-${p.id}-target`).value = s.targetWeight;
-  }
-  document.getElementById('settingsModal').classList.remove('hidden');
+function renderSettings() {
+  document.getElementById('weight-settings').innerHTML = MEMBERS.map(m => {
+    const s = appData.settings[m.id] || {};
+    return `<div class="settings-row"><span class="settings-name">${m.emoji} ${m.name}</span><div class="settings-inputs"><div><input class="settings-input" type="number" step="0.1" id="sw-${m.id}" placeholder="Start" value="${s.startWeight||''}"><div class="settings-lbl">Start kg</div></div><div><input class="settings-input" type="number" step="0.1" id="tw-${m.id}" placeholder="Target" value="${s.targetWeight||''}"><div class="settings-lbl">Target kg</div></div></div></div>`;
+  }).join('');
+  document.getElementById('pin-settings').innerHTML = MEMBERS.map(m =>
+    `<div class="pin-change-row"><span class="pin-change-name">${m.emoji} ${m.name}</span><input class="pin-change-input" type="password" inputmode="numeric" maxlength="4" pattern="[0-9]*" id="np-${m.id}" placeholder="New PIN"></div>`
+  ).join('');
 }
 
 function saveSettings() {
-  for (const p of PEOPLE) {
-    const start  = parseFloat(document.getElementById(`s-${p.id}-start`).value);
-    const target = parseFloat(document.getElementById(`s-${p.id}-target`).value);
-    if (!isNaN(start) && start > 0)   DATA.settings[p.id].startWeight  = start;
-    if (!isNaN(target) && target > 0) DATA.settings[p.id].targetWeight = target;
-  }
-  saveData(DATA);
-  document.getElementById('settingsModal').classList.add('hidden');
-  renderAll();
-  showToast('✅ Settings saved!');
+  let ch = false;
+  MEMBERS.forEach(m => {
+    const sw = document.getElementById('sw-'+m.id)?.value;
+    const tw = document.getElementById('tw-'+m.id)?.value;
+    if (!appData.settings[m.id]) appData.settings[m.id] = {};
+    if (sw && parseFloat(sw)>0) { appData.settings[m.id].startWeight=parseFloat(sw); ch=true; }
+    if (tw && parseFloat(tw)>0) { appData.settings[m.id].targetWeight=parseFloat(tw); ch=true; }
+  });
+  if (ch) { saveData(); renderWeekly(); showToast('✅ Settings saved!'); }
+  else showToast('⚠️ No changes to save.');
 }
 
-// ─── TOAST ──────────────────────────────────────────────────────
+function savePins() {
+  const pins = loadPins(); let ch = false;
+  MEMBERS.forEach(m => {
+    const v = document.getElementById('np-'+m.id)?.value;
+    if (v && /^\d{4}$/.test(v)) { pins[m.id] = v; ch = true; }
+  });
+  if (ch) { storePins(pins); showToast('🔐 PINs updated!'); MEMBERS.forEach(m => { const el=document.getElementById('np-'+m.id); if(el) el.value=''; }); }
+  else showToast('⚠️ Enter a valid 4-digit PIN.');
+}
 
-let toastTimer;
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.bn-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  btn.classList.add('active');
+  if (tab==='today')    renderToday();
+  if (tab==='weekly')   renderWeekly();
+  if (tab==='board')    renderLeaderboard();
+  if (tab==='settings') renderSettings();
+}
+
+function launchConfetti() {
+  const cols = ['#FF6B35','#FFD166','#06D6A0','#118AB2','#EF476F','#FFF'];
+  for (let i = 0; i < 65; i++) {
+    const p = document.createElement('div');
+    p.className = 'confetti-piece';
+    p.style.cssText = `left:${Math.random()*100}vw;top:-12px;background:${cols[Math.floor(Math.random()*cols.length)]};width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;border-radius:${Math.random()>.5?'50%':'3px'};--dur:${1.6+Math.random()*1.8}s;animation-delay:${Math.random()*0.4}s;`;
+    document.body.appendChild(p);
+    p.addEventListener('animationend', () => p.remove());
+  }
+}
+function confettiSmall() {
+  const cols = ['#FF6B35','#FFD166','#06D6A0'];
+  for (let i = 0; i < 25; i++) {
+    const p = document.createElement('div');
+    p.className = 'confetti-piece';
+    p.style.cssText = `left:${25+Math.random()*50}vw;top:30vh;background:${cols[i%3]};width:8px;height:8px;border-radius:50%;--dur:${1+Math.random()}s;animation-delay:${Math.random()*0.2}s;`;
+    document.body.appendChild(p);
+    p.addEventListener('animationend', () => p.remove());
+  }
+}
+
+let _tt;
 function showToast(msg) {
   const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(_tt); _tt = setTimeout(() => t.classList.remove('show'), 3200);
 }
 
-// ─── CONFETTI ───────────────────────────────────────────────────
-
-function fireConfetti() {
-  const colors = ['#06D6A0','#FFD166','#EF476F','#118AB2','#FF6B35','#ffffff'];
-  for (let i = 0; i < 60; i++) {
-    const el = document.createElement('div');
-    el.className = 'confetti-piece';
-    const x = Math.random() * window.innerWidth;
-    const dx = (Math.random() - 0.5) * 400;
-    const dy = Math.random() * 600 + 300;
-    const rot = Math.random() * 720 - 360;
-    const dur = (Math.random() * 0.8 + 0.8).toFixed(2);
-    const size = Math.random() * 8 + 6;
-    el.style.cssText = `
-      left:${x}px; top: -10px;
-      width:${size}px; height:${size}px;
-      background:${colors[Math.floor(Math.random()*colors.length)]};
-      --dx:${dx}px; --dy:${dy}px; --rot:${rot}deg; --dur:${dur}s;
-      border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
-    `;
-    document.body.appendChild(el);
-    setTimeout(() => el.remove(), parseFloat(dur) * 1000 + 100);
-  }
-}
-
-// ─── FLOATING EMOJIS ────────────────────────────────────────────
-
-function spawnFloaters() {
-  const emojis = ['🍉','💪','🥗','🏃','🌟','🔥','🥦','🌊','⚡','🎯','🌿','🍋'];
-  const wrap = document.getElementById('floaters');
-  function spawn() {
-    const el = document.createElement('div');
-    el.className = 'floater';
-    el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-    el.style.left = Math.random() * 95 + '%';
-    el.style.bottom = '-40px';
-    el.style.animationDuration = (Math.random() * 8 + 8) + 's';
-    el.style.animationDelay = (Math.random() * 2) + 's';
-    el.style.fontSize = (Math.random() * 1.2 + 1) + 'rem';
-    wrap.appendChild(el);
-    setTimeout(() => el.remove(), 18000);
-  }
-  spawn();
-  setInterval(spawn, 2200);
-}
-
-// ─── RENDER ALL ──────────────────────────────────────────────────
-
-function renderAll() {
-  renderCheckin();
-  renderWeekStrip();
-  renderLeaderboard();
-  renderWeightSection();
-}
-
-// ─── INIT ────────────────────────────────────────────────────────
-
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('dateDisplay').textContent = formatDate(todayStr());
-
-  const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
-  document.getElementById('quoteBar').textContent = QUOTES[dayOfYear % QUOTES.length];
-
-  document.getElementById('modalSaveBtn').addEventListener('click', saveSettings);
-  document.getElementById('openSettings').addEventListener('click', openSettings);
-
-  document.getElementById('settingsModal').addEventListener('click', e => {
-    if (e.target === document.getElementById('settingsModal')) {
-      document.getElementById('settingsModal').classList.add('hidden');
-    }
-  });
-
-  renderAll();
-  spawnFloaters();
-
-  const hasSettings = PEOPLE.some(p => DATA.settings[p.id].startWeight);
-  if (!hasSettings) openSettings();
-});
+document.addEventListener('DOMContentLoaded', () => { if (currentUser) showApp(); });
 </script>
 </body>
 </html>
