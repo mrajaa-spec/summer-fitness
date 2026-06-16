@@ -39,7 +39,6 @@
     .screen { display: none; }
     .screen.active { display: block; }
 
-    /* ===== LOGIN ===== */
     #login-screen {
       background: linear-gradient(160deg, #FF6B35 0%, #FFD166 40%, #06D6A0 80%, #118AB2 100%);
       min-height: 100vh;
@@ -119,11 +118,7 @@
       z-index: 10;
     }
 
-    .login-sun {
-      font-size: 3rem; display: block;
-      margin-bottom: 6px;
-      animation: sunPulse 4s ease-in-out infinite;
-    }
+    .login-sun { font-size: 3rem; display: block; margin-bottom: 6px; animation: sunPulse 4s ease-in-out infinite; }
     .login-title {
       font-family: 'Fredoka One', cursive;
       font-size: 1.6rem; line-height: 1.2; margin-bottom: 4px;
@@ -140,19 +135,13 @@
     .name-prompt { font-size: 0.95rem; font-weight: 600; margin-bottom: 16px; color: var(--text); }
     .name-buttons { display: flex; flex-direction: column; gap: 10px; }
     .name-btn {
-      padding: 16px;
-      border: 2px solid #EEE; border-radius: var(--radius-sm);
-      background: #FAFAFA;
-      font-family: 'Fredoka One', cursive; font-size: 1.2rem;
+      padding: 16px; border: 2px solid #EEE; border-radius: var(--radius-sm);
+      background: #FAFAFA; font-family: 'Fredoka One', cursive; font-size: 1.2rem;
       cursor: pointer; transition: all 0.2s;
       display: flex; align-items: center; justify-content: center; gap: 10px;
       min-height: 56px;
     }
-    .name-btn:active {
-      border-color: var(--orange);
-      background: linear-gradient(135deg, #FF6B35, #FFD166);
-      color: white; transform: scale(0.97);
-    }
+    .name-btn:active { border-color: var(--orange); background: linear-gradient(135deg, #FF6B35, #FFD166); color: white; transform: scale(0.97); }
 
     .pin-header { font-size: 0.85rem; color: var(--text-light); margin-bottom: 2px; }
     .pin-user { font-family: 'Fredoka One', cursive; font-size: 1.4rem; margin-bottom: 18px; color: var(--orange); }
@@ -167,18 +156,16 @@
 
     .pin-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
     .pin-key {
-      padding: 0; height: 60px;
-      border: none; border-radius: 14px;
-      background: #F4F4F4;
-      font-family: 'Poppins', sans-serif; font-size: 1.4rem; font-weight: 600;
-      cursor: pointer; transition: background 0.1s;
+      padding: 0; height: 60px; border: none; border-radius: 14px;
+      background: #F4F4F4; font-family: 'Poppins', sans-serif;
+      font-size: 1.4rem; font-weight: 600; cursor: pointer;
       user-select: none; -webkit-user-select: none;
       display: flex; align-items: center; justify-content: center;
+      /* No transition — instant feedback on mobile */
     }
     .pin-key:active { background: #D0D0D0; }
     .pin-key.delete { background: #FFF0E8; color: var(--orange); font-size: 1.1rem; }
-    .pin-key.empty { background: transparent; cursor: default; }
-    .pin-key.empty:active { background: transparent; }
+    .pin-key.empty { background: transparent; cursor: default; pointer-events: none; }
 
     .pin-error { color: var(--red); font-size: 0.82rem; margin-top: 12px; min-height: 18px; }
     .back-btn {
@@ -188,7 +175,6 @@
       min-height: 36px; display: inline-block; padding: 8px;
     }
 
-    /* ===== MAIN APP ===== */
     #app {
       max-width: 480px; margin: 0 auto;
       padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 10px);
@@ -207,28 +193,16 @@
     }
 
     .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-    .user-chip {
-      background: rgba(255,255,255,0.3); padding: 5px 12px;
-      border-radius: 20px; font-size: 0.8rem; font-weight: 600; color: white;
-    }
+    .user-chip { background: rgba(255,255,255,0.3); padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; color: white; }
     .logout-btn {
       background: rgba(255,255,255,0.2); border: none; border-radius: 20px;
       padding: 5px 12px; color: white; font-size: 0.76rem; cursor: pointer;
       font-family: 'Poppins', sans-serif; min-height: 36px;
     }
-    .app-title {
-      font-family: 'Fredoka One', cursive;
-      font-size: 1.4rem; color: white;
-      text-shadow: 0 2px 10px rgba(0,0,0,0.1); line-height: 1.2;
-    }
+    .app-title { font-family: 'Fredoka One', cursive; font-size: 1.4rem; color: white; text-shadow: 0 2px 10px rgba(0,0,0,0.1); line-height: 1.2; }
     .floating-emojis { position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; overflow: hidden; }
-    .fe {
-      position: absolute; font-size: 1.3rem;
-      animation: floatAround var(--d) ease-in-out infinite;
-      animation-delay: var(--delay); opacity: 0.22;
-    }
+    .fe { position: absolute; font-size: 1.3rem; animation: floatAround var(--d) ease-in-out infinite; animation-delay: var(--delay); opacity: 0.22; }
 
-    /* Bottom Nav */
     .bottom-nav {
       position: fixed; bottom: 0; left: 0; right: 0;
       background: white; border-top: 1px solid #EBEBEB;
@@ -238,11 +212,9 @@
     }
     .bn-item {
       flex: 1; display: flex; flex-direction: column;
-      align-items: center; gap: 2px;
-      min-height: 50px; padding: 4px 2px;
+      align-items: center; gap: 2px; min-height: 50px; padding: 4px 2px;
       cursor: pointer; border: none; background: none;
-      font-family: 'Poppins', sans-serif;
-      color: var(--text-light); font-size: 0.6rem; font-weight: 600;
+      font-family: 'Poppins', sans-serif; color: var(--text-light); font-size: 0.6rem; font-weight: 600;
       transition: color 0.15s;
     }
     .bn-icon { font-size: 1.35rem; line-height: 1; }
@@ -251,27 +223,13 @@
     .tab-content { display: none; padding: 0 14px; }
     .tab-content.active { display: block; }
 
-    /* Cards */
-    .card {
-      background: white; border-radius: var(--radius);
-      padding: 18px; margin-bottom: 12px;
-      box-shadow: var(--shadow);
-    }
-    .card-title {
-      font-family: 'Fredoka One', cursive;
-      font-size: 1rem; margin-bottom: 12px;
-      display: flex; align-items: center; gap: 8px;
-    }
+    .card { background: white; border-radius: var(--radius); padding: 18px; margin-bottom: 12px; box-shadow: var(--shadow); }
+    .card-title { font-family: 'Fredoka One', cursive; font-size: 1rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
 
-    /* Today */
     .today-date { font-size: 0.8rem; color: var(--text-light); text-align: center; margin-bottom: 2px; padding-top: 12px; }
     .today-greeting { font-family: 'Fredoka One', cursive; font-size: 1.2rem; text-align: center; margin-bottom: 12px; }
 
-    .motivation-card {
-      background: linear-gradient(135deg, #118AB2 0%, #06D6A0 100%);
-      color: white; border-radius: var(--radius); padding: 16px;
-      margin-bottom: 12px;
-    }
+    .motivation-card { background: linear-gradient(135deg, #118AB2 0%, #06D6A0 100%); color: white; border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
     .motivation-emoji { font-size: 1.6rem; margin-bottom: 4px; display: block; }
     .motivation-quote { font-size: 0.88rem; font-weight: 500; line-height: 1.5; }
 
@@ -283,17 +241,13 @@
       animation: pulseRing 2s ease-in-out infinite;
     }
     .flame-icon { animation: streakFlame 0.7s ease-in-out infinite; display: inline-block; }
-
     .checkin-label { font-size: 0.85rem; color: var(--text-light); margin-bottom: 12px; }
 
     .rag-buttons { display: flex; gap: 8px; justify-content: center; margin-bottom: 8px; }
     .rag-btn {
-      flex: 1; padding: 14px 4px;
-      border: 3px solid transparent; border-radius: var(--radius-sm);
-      cursor: pointer; font-family: 'Poppins', sans-serif;
-      font-weight: 700; font-size: 0.72rem; transition: all 0.2s;
-      display: flex; flex-direction: column; align-items: center; gap: 5px;
-      min-height: 80px;
+      flex: 1; padding: 14px 4px; border: 3px solid transparent; border-radius: var(--radius-sm);
+      cursor: pointer; font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 0.72rem;
+      transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 5px; min-height: 80px;
     }
     .rag-emoji { font-size: 1.6rem; }
     .rag-btn.green-btn { background: #E8FFF7; border-color: #06D6A0; color: #047A5B; }
@@ -303,39 +257,23 @@
     .rag-btn.amber-btn.selected { background: #FFD166; color: #5A4500; box-shadow: 0 4px 16px rgba(255,209,102,0.4); }
     .rag-btn.red-btn.selected   { background: #EF476F; color: white; box-shadow: 0 4px 16px rgba(239,71,111,0.4); }
     .rag-btn:active { transform: scale(0.94); }
-
     .logged-note { font-size: 0.78rem; color: var(--text-light); text-align: center; }
 
-    /* Family today */
     .family-row { display: flex; gap: 8px; }
-    .member-card-sm {
-      flex: 1; text-align: center; padding: 10px 4px;
-      border-radius: var(--radius-sm); background: #F9F9F9;
-    }
+    .member-card-sm { flex: 1; text-align: center; padding: 10px 4px; border-radius: var(--radius-sm); background: #F9F9F9; }
     .member-name-sm { font-weight: 700; font-size: 0.75rem; margin-bottom: 5px; }
-    .rag-circle {
-      width: 32px; height: 32px; border-radius: 50%;
-      margin: 0 auto 3px; display: flex;
-      align-items: center; justify-content: center;
-      font-size: 0.85rem; font-weight: 700; color: white;
-    }
+    .rag-circle { width: 32px; height: 32px; border-radius: 50%; margin: 0 auto 3px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 700; color: white; }
     .rag-circle.green { background: #06D6A0; }
     .rag-circle.amber { background: #FFD166; color: #5A4500; }
     .rag-circle.red   { background: #EF476F; }
     .rag-circle.none  { background: #E0E0E0; color: #999; }
     .rag-circle-label { font-size: 0.6rem; color: var(--text-light); }
 
-    /* Forward-looking week strip */
     .week-strip { display: flex; gap: 3px; overflow-x: auto; padding-bottom: 4px; }
     .week-strip::-webkit-scrollbar { display: none; }
     .day-cell { flex: 0 0 calc(14.28% - 3px); min-width: 38px; text-align: center; }
     .day-label { font-size: 0.56rem; color: var(--text-light); margin-bottom: 4px; font-weight: 600; line-height: 1.2; }
-    .day-dot {
-      width: 26px; height: 26px; border-radius: 50%;
-      margin: 0 auto 2px; display: flex;
-      align-items: center; justify-content: center;
-      font-size: 0.58rem; font-weight: 800; color: white;
-    }
+    .day-dot { width: 26px; height: 26px; border-radius: 50%; margin: 0 auto 2px; display: flex; align-items: center; justify-content: center; font-size: 0.58rem; font-weight: 800; color: white; }
     .day-dot.green { background: #06D6A0; }
     .day-dot.amber { background: #FFD166; color: #5A4500; }
     .day-dot.red   { background: #EF476F; }
@@ -343,20 +281,11 @@
     .day-dot.upcoming { background: #F2F2F2; color: #CCC; }
     .day-dot.today-ring { outline: 2px solid var(--orange); outline-offset: 2px; }
 
-    /* Weekly tab */
-    .weight-entry {
-      display: flex; align-items: center; gap: 10px;
-      padding: 12px 0; border-bottom: 1px solid #F4F4F4;
-    }
+    .weight-entry { display: flex; align-items: center; gap: 10px; padding: 12px 0; border-bottom: 1px solid #F4F4F4; }
     .weight-entry:last-child { border-bottom: none; }
     .we-name { font-weight: 700; font-size: 0.85rem; min-width: 68px; }
     .we-input-wrap { flex: 1; position: relative; }
-    .we-input {
-      width: 100%; padding: 11px 36px 11px 12px;
-      border: 2px solid #EEE; border-radius: 10px;
-      font-family: 'Poppins', sans-serif; font-size: 1rem; outline: none;
-      transition: border-color 0.2s; -webkit-appearance: none;
-    }
+    .we-input { width: 100%; padding: 11px 36px 11px 12px; border: 2px solid #EEE; border-radius: 10px; font-family: 'Poppins', sans-serif; font-size: 1rem; outline: none; transition: border-color 0.2s; -webkit-appearance: none; }
     .we-input:focus { border-color: var(--orange); }
     .we-unit { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: var(--text-light); font-size: 0.75rem; }
 
@@ -365,18 +294,9 @@
     .ring-label { font-size: 0.78rem; font-weight: 700; margin-top: 5px; }
     .ring-sub { font-size: 0.65rem; color: var(--text-light); }
 
-    /* Leaderboard */
-    .podium {
-      display: flex; align-items: flex-end;
-      justify-content: center; gap: 8px;
-      padding: 14px 4px 8px; margin-bottom: 6px;
-    }
+    .podium { display: flex; align-items: flex-end; justify-content: center; gap: 8px; padding: 14px 4px 8px; margin-bottom: 6px; }
     .podium-slot { text-align: center; flex: 1; max-width: 110px; }
-    .podium-block {
-      border-radius: 12px 12px 0 0;
-      display: flex; align-items: flex-end;
-      justify-content: center; padding-bottom: 8px; font-size: 1.4rem;
-    }
+    .podium-block { border-radius: 12px 12px 0 0; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 8px; font-size: 1.4rem; }
     .podium-slot.p1 .podium-block { height: 110px; background: linear-gradient(180deg, #FFD700, #FFA500); }
     .podium-slot.p2 .podium-block { height: 80px;  background: linear-gradient(180deg, #C8C8C8, #989898); }
     .podium-slot.p3 .podium-block { height: 60px;  background: linear-gradient(180deg, #CD7F32, #9A5A1A); }
@@ -392,55 +312,26 @@
     .rank-sub { font-size: 0.7rem; color: var(--text-light); }
     .rank-pts { font-family: 'Fredoka One', cursive; font-size: 1.2rem; color: var(--orange); }
 
-    /* Settings */
     .settings-row { display: flex; align-items: flex-start; gap: 10px; padding: 12px 0; border-bottom: 1px solid #F4F4F4; }
     .settings-row:last-child { border-bottom: none; }
     .settings-name { font-weight: 700; font-size: 0.85rem; min-width: 64px; padding-top: 10px; }
     .settings-inputs { flex: 1; display: flex; gap: 8px; }
-    .settings-input {
-      flex: 1; padding: 10px 8px; border: 2px solid #EEE;
-      border-radius: 10px; font-family: 'Poppins', sans-serif;
-      font-size: 0.9rem; outline: none; transition: border-color 0.2s;
-      -webkit-appearance: none; width: 100%;
-    }
+    .settings-input { flex: 1; padding: 10px 8px; border: 2px solid #EEE; border-radius: 10px; font-family: 'Poppins', sans-serif; font-size: 0.9rem; outline: none; transition: border-color 0.2s; -webkit-appearance: none; width: 100%; }
     .settings-input:focus { border-color: var(--orange); }
     .settings-lbl { font-size: 0.6rem; color: var(--text-light); text-align: center; margin-top: 2px; }
 
     .pin-change-row { display: flex; align-items: center; gap: 10px; padding: 12px 0; border-bottom: 1px solid #F4F4F4; }
     .pin-change-row:last-child { border-bottom: none; }
     .pin-change-name { font-weight: 700; font-size: 0.85rem; min-width: 64px; }
-    .pin-change-input {
-      flex: 1; padding: 10px 12px; border: 2px solid #EEE;
-      border-radius: 10px; font-family: 'Poppins', sans-serif;
-      font-size: 1rem; outline: none; letter-spacing: 6px;
-      transition: border-color 0.2s; -webkit-appearance: none;
-    }
+    .pin-change-input { flex: 1; padding: 10px 12px; border: 2px solid #EEE; border-radius: 10px; font-family: 'Poppins', sans-serif; font-size: 1rem; outline: none; letter-spacing: 6px; transition: border-color 0.2s; -webkit-appearance: none; }
     .pin-change-input:focus { border-color: var(--orange); }
 
-    .save-btn {
-      width: 100%; padding: 16px; border: none;
-      border-radius: var(--radius-sm);
-      background: linear-gradient(135deg, #FF6B35, #FFD166);
-      color: white; font-family: 'Fredoka One', cursive;
-      font-size: 1.05rem; cursor: pointer; transition: all 0.2s;
-      margin-top: 14px; min-height: 54px;
-    }
+    .save-btn { width: 100%; padding: 16px; border: none; border-radius: var(--radius-sm); background: linear-gradient(135deg, #FF6B35, #FFD166); color: white; font-family: 'Fredoka One', cursive; font-size: 1.05rem; cursor: pointer; transition: all 0.2s; margin-top: 14px; min-height: 54px; }
     .save-btn:active { transform: scale(0.97); }
 
-    /* First-login PIN highlight */
-    .pin-change-row.highlight .pin-change-input {
-      border-color: var(--orange);
-      background: #FFF8F0;
-      animation: pulseRing 1.5s ease-in-out 3;
-    }
-    .pin-first-notice {
-      background: linear-gradient(135deg, #FF6B35, #FFD166);
-      color: white; border-radius: var(--radius-sm);
-      padding: 12px 16px; margin-bottom: 14px;
-      font-size: 0.88rem; font-weight: 600; line-height: 1.4;
-    }
+    .pin-change-row.highlight .pin-change-input { border-color: var(--orange); background: #FFF8F0; animation: pulseRing 1.5s ease-in-out 3; }
+    .pin-first-notice { background: linear-gradient(135deg, #FF6B35, #FFD166); color: white; border-radius: var(--radius-sm); padding: 12px 16px; margin-bottom: 14px; font-size: 0.88rem; font-weight: 600; line-height: 1.4; }
 
-    /* Toast */
     .toast {
       position: fixed; bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 8px); left: 50%;
       transform: translateX(-50%) translateY(12px);
@@ -448,30 +339,18 @@
       padding: 10px 20px; border-radius: 22px;
       font-size: 0.85rem; font-weight: 600;
       opacity: 0; transition: all 0.3s; z-index: 9000;
-      text-align: center; max-width: 290px; pointer-events: none;
-      white-space: nowrap;
+      text-align: center; max-width: 290px; pointer-events: none; white-space: nowrap;
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    /* Confetti */
-    .confetti-piece {
-      position: fixed; pointer-events: none; z-index: 9999;
-      border-radius: 2px;
-      animation: confettiFall var(--dur) ease-out forwards;
-    }
+    .confetti-piece { position: fixed; pointer-events: none; z-index: 9999; border-radius: 2px; animation: confettiFall var(--dur) ease-out forwards; }
 
-    .pts-badge {
-      display: inline-flex; align-items: center; gap: 3px;
-      background: rgba(255,255,255,0.28); color: white;
-      padding: 3px 10px; border-radius: 12px;
-      font-size: 0.76rem; font-weight: 700;
-    }
+    .pts-badge { display: inline-flex; align-items: center; gap: 3px; background: rgba(255,255,255,0.28); color: white; padding: 3px 10px; border-radius: 12px; font-size: 0.76rem; font-weight: 700; }
     .week-pts-row { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin-top: 6px; }
   </style>
 </head>
 <body>
 
-<!-- LOGIN -->
 <div id="login-screen" class="screen active">
   <span style="--duration:6s;top:8%;left:8%;" class="float-bg">&#127817;</span>
   <span style="--duration:8s;top:12%;right:10%;" class="float-bg">&#128170;</span>
@@ -504,18 +383,18 @@
         <div class="pin-dot" id="dot-3"></div>
       </div>
       <div class="pin-grid">
-        <button class="pin-key" ontouchstart="pinKey('1')" onclick="pinKey('1')">1</button>
-        <button class="pin-key" ontouchstart="pinKey('2')" onclick="pinKey('2')">2</button>
-        <button class="pin-key" ontouchstart="pinKey('3')" onclick="pinKey('3')">3</button>
-        <button class="pin-key" ontouchstart="pinKey('4')" onclick="pinKey('4')">4</button>
-        <button class="pin-key" ontouchstart="pinKey('5')" onclick="pinKey('5')">5</button>
-        <button class="pin-key" ontouchstart="pinKey('6')" onclick="pinKey('6')">6</button>
-        <button class="pin-key" ontouchstart="pinKey('7')" onclick="pinKey('7')">7</button>
-        <button class="pin-key" ontouchstart="pinKey('8')" onclick="pinKey('8')">8</button>
-        <button class="pin-key" ontouchstart="pinKey('9')" onclick="pinKey('9')">9</button>
+        <button class="pin-key" onclick="pinKey('1')">1</button>
+        <button class="pin-key" onclick="pinKey('2')">2</button>
+        <button class="pin-key" onclick="pinKey('3')">3</button>
+        <button class="pin-key" onclick="pinKey('4')">4</button>
+        <button class="pin-key" onclick="pinKey('5')">5</button>
+        <button class="pin-key" onclick="pinKey('6')">6</button>
+        <button class="pin-key" onclick="pinKey('7')">7</button>
+        <button class="pin-key" onclick="pinKey('8')">8</button>
+        <button class="pin-key" onclick="pinKey('9')">9</button>
         <button class="pin-key empty" disabled></button>
-        <button class="pin-key" ontouchstart="pinKey('0')" onclick="pinKey('0')">0</button>
-        <button class="pin-key delete" ontouchstart="pinDelete()" onclick="pinDelete()">&#9003;</button>
+        <button class="pin-key" onclick="pinKey('0')">0</button>
+        <button class="pin-key delete" onclick="pinDelete()">&#9003;</button>
       </div>
       <p class="pin-error" id="pin-error"></p>
       <button class="back-btn" onclick="backToNames()">&larr; Change name</button>
@@ -523,7 +402,6 @@
   </div>
 </div>
 
-<!-- MAIN APP -->
 <div id="app" class="screen">
   <div class="app-header">
     <div class="floating-emojis" id="header-emojis"></div>
@@ -536,21 +414,12 @@
   </div>
 
   <nav class="bottom-nav">
-    <button class="bn-item active" onclick="switchTab('today',this)">
-      <span class="bn-icon">&#127968;</span>Today
-    </button>
-    <button class="bn-item" onclick="switchTab('weekly',this)">
-      <span class="bn-icon">&#9878;&#65039;</span>Weekly
-    </button>
-    <button class="bn-item" onclick="switchTab('board',this)">
-      <span class="bn-icon">&#127942;</span>Board
-    </button>
-    <button class="bn-item" onclick="switchTab('settings',this)">
-      <span class="bn-icon">&#9881;&#65039;</span>Settings
-    </button>
+    <button class="bn-item active" onclick="switchTab('today',this)"><span class="bn-icon">&#127968;</span>Today</button>
+    <button class="bn-item" onclick="switchTab('weekly',this)"><span class="bn-icon">&#9878;&#65039;</span>Weekly</button>
+    <button class="bn-item" onclick="switchTab('board',this)"><span class="bn-icon">&#127942;</span>Board</button>
+    <button class="bn-item" onclick="switchTab('settings',this)"><span class="bn-icon">&#9881;&#65039;</span>Settings</button>
   </nav>
 
-  <!-- TODAY -->
   <div id="tab-today" class="tab-content active">
     <p class="today-date" id="today-date"></p>
     <p class="today-greeting" id="today-greeting"></p>
@@ -563,15 +432,9 @@
       <div id="streak-area"></div>
       <p class="checkin-label" id="checkin-label">How are your calories today?</p>
       <div class="rag-buttons" id="rag-buttons">
-        <button class="rag-btn green-btn" onclick="logRag('green')">
-          <span class="rag-emoji">&#129001;</span>On target!
-        </button>
-        <button class="rag-btn amber-btn" onclick="logRag('amber')">
-          <span class="rag-emoji">&#129000;</span>Nearly there
-        </button>
-        <button class="rag-btn red-btn" onclick="logRag('red')">
-          <span class="rag-emoji">&#128997;</span>Over budget
-        </button>
+        <button class="rag-btn green-btn" onclick="logRag('green')"><span class="rag-emoji">&#129001;</span>On target!</button>
+        <button class="rag-btn amber-btn" onclick="logRag('amber')"><span class="rag-emoji">&#129000;</span>Nearly there</button>
+        <button class="rag-btn red-btn" onclick="logRag('red')"><span class="rag-emoji">&#128997;</span>Over budget</button>
       </div>
       <div id="logged-note" class="logged-note"></div>
     </div>
@@ -585,7 +448,6 @@
     </div>
   </div>
 
-  <!-- WEEKLY -->
   <div id="tab-weekly" class="tab-content">
     <div class="card" style="margin-top:14px;">
       <div class="card-title">&#9878;&#65039; Weekly Weigh-in</div>
@@ -599,7 +461,6 @@
     </div>
   </div>
 
-  <!-- LEADERBOARD -->
   <div id="tab-board" class="tab-content">
     <div class="card" style="margin-top:14px;">
       <div class="card-title">&#127942; This Week's Podium</div>
@@ -611,7 +472,6 @@
     </div>
   </div>
 
-  <!-- SETTINGS -->
   <div id="tab-settings" class="tab-content">
     <div class="card" style="margin-top:14px;">
       <div class="card-title">&#9878;&#65039; Weight Targets</div>
@@ -637,19 +497,14 @@ const MEMBERS = [
   { id: 'ashwini', name: 'Ashwini', emoji: '🌺' },
   { id: 'murali',  name: 'Murali',  emoji: '💪' }
 ];
-
-const DATA_KEY    = 'swlc_v1';
-const PINS_KEY    = 'swlc_pins';
-const SESSION_KEY = 'swlc_session';
-const PIN_SET_KEY = 'swlc_pinset'; // tracks who has changed their default PIN
+const DATA_KEY = 'swlc_v1', PINS_KEY = 'swlc_pins', SESSION_KEY = 'swlc_session', PIN_SET_KEY = 'swlc_pinset';
 const DEFAULT_PINS = { pallavi: '1111', ashwini: '2222', murali: '3333' };
-
 const QUOTES = [
   { e:'🌅', t:'Every sunrise brings a new chance to make healthier choices.' },
   { e:'💪', t:'Small steps every day lead to big results. Keep going!' },
   { e:'🌟', t:'You are stronger than any craving. Believe it!' },
   { e:'🏃', t:"The only bad workout is the one that didn't happen." },
-  { e:'🥗', t:"Feed your goals, not your stress. Make it count today!" },
+  { e:'🥗', t:'Feed your goals, not your stress. Make it count today!' },
   { e:'🔥', t:"Consistency is the secret ingredient. You've got this!" },
   { e:'🎯', t:'Focus on progress, not perfection. Every green day wins!' },
   { e:'🌈', t:'Healthy habits are self-love in action.' },
@@ -659,76 +514,49 @@ const QUOTES = [
   { e:'🙏', t:'Be patient with yourself — great things take time.' }
 ];
 
-function loadPins() {
-  const s = localStorage.getItem(PINS_KEY);
-  return s ? JSON.parse(s) : { ...DEFAULT_PINS };
-}
+function loadPins() { const s = localStorage.getItem(PINS_KEY); return s ? JSON.parse(s) : { ...DEFAULT_PINS }; }
 function storePins(p) { localStorage.setItem(PINS_KEY, JSON.stringify(p)); }
-
 function loadData() {
   const s = localStorage.getItem(DATA_KEY);
   if (s) return JSON.parse(s);
-  return {
-    settings: {
-      pallavi: { startWeight: null, targetWeight: null },
-      ashwini: { startWeight: null, targetWeight: null },
-      murali:  { startWeight: null, targetWeight: null }
-    },
-    daily: {}, weekly: {}
-  };
+  return { settings: { pallavi:{startWeight:null,targetWeight:null}, ashwini:{startWeight:null,targetWeight:null}, murali:{startWeight:null,targetWeight:null} }, daily:{}, weekly:{} };
 }
 function saveData() { localStorage.setItem(DATA_KEY, JSON.stringify(appData)); }
 
 let appData = loadData();
 let currentUser = sessionStorage.getItem(SESSION_KEY);
-let pinBuffer = '';
-let loginName = '';
-let pinBusy = false;  // prevent double-entry while transitioning
+let pinBuffer = '', loginName = '', pinBusy = false;
 
 function todayKey() { return new Date().toISOString().split('T')[0]; }
-
 function weekKey(d) {
   const dt = d ? new Date(d) : new Date();
-  const doy = Math.floor((dt - new Date(dt.getFullYear(), 0, 0)) / 86400000);
-  return dt.getFullYear() + '-W' + String(Math.ceil((doy + 1) / 7)).padStart(2, '0');
+  const doy = Math.floor((dt - new Date(dt.getFullYear(),0,0)) / 86400000);
+  return dt.getFullYear() + '-W' + String(Math.ceil((doy+1)/7)).padStart(2,'0');
 }
-
-// Forward-looking: today + next 6 days
 function getForwardDates() {
-  return Array.from({ length: 7 }, (_, i) => {
-    const d = new Date();
-    d.setDate(d.getDate() + i);
-    return d.toISOString().split('T')[0];
-  });
+  return Array.from({length:7}, (_,i) => { const d = new Date(); d.setDate(d.getDate()+i); return d.toISOString().split('T')[0]; });
 }
-
-const SHORT_DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const SHORT_DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 function memberInfo(id) { return MEMBERS.find(m => m.id === id); }
 
 function calcStreak(id) {
   let streak = 0;
-  const d = new Date(); d.setDate(d.getDate() - 1);
+  const d = new Date(); d.setDate(d.getDate()-1);
   for (let i = 0; i < 90; i++) {
     const k = d.toISOString().split('T')[0];
-    if (appData.daily[k]?.[id] === 'green') { streak++; d.setDate(d.getDate() - 1); }
-    else break;
+    if (appData.daily[k]?.[id] === 'green') { streak++; d.setDate(d.getDate()-1); } else break;
   }
   if (appData.daily[todayKey()]?.[id] === 'green') streak++;
   return streak;
 }
-
 function calcPoints(id, weekOnly) {
-  const wk = weekKey();
-  let pts = 0;
+  const wk = weekKey(); let pts = 0;
   Object.entries(appData.daily).forEach(([date, day]) => {
     if (weekOnly && weekKey(date) !== wk) return;
-    const v = day[id];
-    if (v === 'green') pts += 3;
-    else if (v === 'amber') pts += 1;
+    if (day[id] === 'green') pts += 3; else if (day[id] === 'amber') pts += 1;
   });
   if (weekOnly) {
-    const w = appData.weekly[wk];
-    const s = appData.settings[id];
+    const w = appData.weekly[wk], s = appData.settings[id];
     if (w?.[id] && s?.targetWeight && parseFloat(w[id]) <= parseFloat(s.targetWeight)) pts += 5;
   }
   return pts;
@@ -744,14 +572,12 @@ function selectName(name) {
   pinBuffer = ''; pinBusy = false; updatePinDots();
   document.getElementById('pin-error').textContent = '';
 }
-
 function backToNames() {
   document.getElementById('step-pin').classList.remove('active');
   document.getElementById('step-name').classList.add('active');
   loginName = ''; pinBuffer = ''; pinBusy = false;
   document.getElementById('pin-error').textContent = '';
 }
-
 function pinKey(digit) {
   if (pinBusy || pinBuffer.length >= 4) return;
   pinBuffer += digit;
@@ -759,58 +585,41 @@ function pinKey(digit) {
   document.getElementById('pin-error').textContent = '';
   if (pinBuffer.length === 4) {
     pinBusy = true;
-    // Flash dots green before transitioning
     for (let i = 0; i < 4; i++) {
-      const dot = document.getElementById('dot-' + i);
-      dot.classList.remove('filled');
-      dot.classList.add('success');
+      const dot = document.getElementById('dot-'+i);
+      dot.classList.remove('filled'); dot.classList.add('success');
     }
-    setTimeout(checkPin, 280);
+    setTimeout(checkPin, 300);
   }
 }
-
 function pinDelete() {
   if (pinBusy) return;
-  pinBuffer = pinBuffer.slice(0, -1);
-  updatePinDots();
+  pinBuffer = pinBuffer.slice(0,-1); updatePinDots();
 }
-
 function updatePinDots() {
   for (let i = 0; i < 4; i++) {
-    const dot = document.getElementById('dot-' + i);
+    const dot = document.getElementById('dot-'+i);
     dot.classList.remove('success');
     dot.classList.toggle('filled', i < pinBuffer.length);
   }
 }
-
 function checkPin() {
   const pins = loadPins();
   if (pins[loginName] === pinBuffer) {
     sessionStorage.setItem(SESSION_KEY, loginName);
     currentUser = loginName;
-    // Detect first login (PIN still default)
     const pinSetData = JSON.parse(localStorage.getItem(PIN_SET_KEY) || '{}');
-    const isFirstLogin = !pinSetData[loginName];
-    showApp(isFirstLogin);
+    showApp(!pinSetData[loginName]);
   } else {
-    // Wrong PIN — shake and reset
     const pd = document.getElementById('pin-dots');
-    for (let i = 0; i < 4; i++) {
-      const d = document.getElementById('dot-' + i);
-      d.classList.remove('success');
-    }
+    for (let i = 0; i < 4; i++) document.getElementById('dot-'+i).classList.remove('success');
     document.getElementById('pin-error').textContent = '❌ Incorrect PIN. Try again.';
     pd.style.animation = 'shake 0.5s ease';
-    setTimeout(() => {
-      pd.style.animation = '';
-      pinBuffer = ''; pinBusy = false; updatePinDots();
-    }, 600);
+    setTimeout(() => { pd.style.animation = ''; pinBuffer = ''; pinBusy = false; updatePinDots(); }, 600);
   }
 }
-
 function logout() {
-  sessionStorage.removeItem(SESSION_KEY);
-  currentUser = null;
+  sessionStorage.removeItem(SESSION_KEY); currentUser = null;
   document.getElementById('app').classList.remove('active');
   document.getElementById('login-screen').classList.add('active');
   document.getElementById('step-pin').classList.remove('active');
@@ -823,7 +632,6 @@ function showApp(isFirstLogin) {
   document.getElementById('login-screen').classList.remove('active');
   document.getElementById('app').classList.add('active');
   if (isFirstLogin) {
-    // Go straight to Settings so they set their PIN
     switchTab('settings', document.querySelectorAll('.bn-item')[3]);
     setTimeout(() => showToast('👋 First login! Please set your own PIN below.'), 400);
   } else {
@@ -831,267 +639,196 @@ function showApp(isFirstLogin) {
   }
   initApp();
 }
-
 function initApp() {
   const m = memberInfo(currentUser);
   document.getElementById('user-chip').textContent = m.emoji + ' ' + m.name;
   const container = document.getElementById('header-emojis');
   container.innerHTML = '';
-  ['🍉','💪','🥗','🏃','⭐','🔥','🥦','🎯'].forEach((e, i) => {
+  ['🍉','💪','🥗','🏃','⭐','🔥','🥦','🎯'].forEach((e,i) => {
     const s = document.createElement('span');
     s.className = 'fe'; s.textContent = e;
-    s.style.cssText = `left:${8 + i * 12}%;top:${12 + (i % 3) * 22}%;--d:${5 + i}s;--delay:${i * 0.4}s;`;
+    s.style.cssText = `left:${8+i*12}%;top:${12+(i%3)*22}%;--d:${5+i}s;--delay:${i*0.4}s;`;
     container.appendChild(s);
   });
-  const wkPts = MEMBERS.map(mm => ({ ...mm, pts: calcPoints(mm.id, true) }));
+  const wkPts = MEMBERS.map(mm => ({ ...mm, pts: calcPoints(mm.id,true) }));
   document.getElementById('week-pts-row').innerHTML = wkPts.map(mm =>
-    `<div class="pts-badge">${mm.emoji} ${mm.name.split(' ')[0]} ${mm.pts}pts</div>`
-  ).join('');
+    `<div class="pts-badge">${mm.emoji} ${mm.name.split(' ')[0]} ${mm.pts}pts</div>`).join('');
 }
 
 // ===== TODAY =====
 function renderToday() {
   const today = new Date();
-  document.getElementById('today-date').textContent =
-    today.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+  document.getElementById('today-date').textContent = today.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
   const m = memberInfo(currentUser);
   const h = today.getHours();
-  const greet = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
-  document.getElementById('today-greeting').textContent = `${greet}, ${m.name}! ${m.emoji}`;
-  const doy = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 86400000);
+  document.getElementById('today-greeting').textContent = `${h<12?'Good morning':h<17?'Good afternoon':'Good evening'}, ${m.name}! ${m.emoji}`;
+  const doy = Math.floor((today - new Date(today.getFullYear(),0,0)) / 86400000);
   const q = QUOTES[doy % QUOTES.length];
   document.getElementById('mot-emoji').textContent = q.e;
   document.getElementById('mot-quote').textContent = q.t;
   const streak = calcStreak(currentUser);
   document.getElementById('streak-area').innerHTML = streak >= 2
-    ? `<div class="streak-badge"><span class="flame-icon">🔥</span>${streak} day streak!</div>`
-    : '';
-  const tk = todayKey();
-  const myStatus = appData.daily[tk]?.[currentUser];
+    ? `<div class="streak-badge"><span class="flame-icon">🔥</span>${streak} day streak!</div>` : '';
+  const tk = todayKey(), myStatus = appData.daily[tk]?.[currentUser];
   document.getElementById('checkin-label').textContent = myStatus ? 'Logged today:' : 'How are your calories today?';
   document.getElementById('logged-note').textContent = myStatus ? '✔ Tap to change' : '';
   document.getElementById('rag-buttons').querySelectorAll('.rag-btn').forEach(b => b.classList.remove('selected'));
-  if (myStatus) {
-    const sel = document.querySelector('.' + myStatus + '-btn');
-    if (sel) sel.classList.add('selected');
-  }
-  const todayLog = appData.daily[tk] || {};
-  const icons = { green: '✓', amber: '~', red: '✗', none: '?' };
+  if (myStatus) { const sel = document.querySelector('.'+myStatus+'-btn'); if (sel) sel.classList.add('selected'); }
+  const todayLog = appData.daily[tk] || {}, icons = {green:'✓',amber:'~',red:'✗',none:'?'};
   document.getElementById('family-today').innerHTML = MEMBERS.map(mm => {
     const st = todayLog[mm.id] || 'none';
-    return `<div class="member-card-sm"><div class="member-name-sm">${mm.emoji} ${mm.name.slice(0, 7)}</div><div class="rag-circle ${st}">${icons[st]}</div><div class="rag-circle-label">${st === 'none' ? 'Not yet' : st}</div></div>`;
+    return `<div class="member-card-sm"><div class="member-name-sm">${mm.emoji} ${mm.name.slice(0,7)}</div><div class="rag-circle ${st}">${icons[st]}</div><div class="rag-circle-label">${st==='none'?'Not yet':st}</div></div>`;
   }).join('');
   renderWeekStrip();
 }
-
 function renderWeekStrip() {
-  const dates = getForwardDates();
-  const tk = todayKey();
-  document.getElementById('week-strip').innerHTML = dates.map((d, i) => {
-    const log = appData.daily[d] || {};
-    const isToday = i === 0;
-    const dt = new Date(d + 'T12:00:00'); // noon avoids DST issues
-    const shortLabel = isToday ? 'Today' : (i === 1 ? 'Tmrw' : SHORT_DAYS[dt.getDay()] + ' ' + dt.getDate());
+  const dates = getForwardDates(), tk = todayKey();
+  document.getElementById('week-strip').innerHTML = dates.map((d,i) => {
+    const log = appData.daily[d] || {}, isToday = i===0;
+    const dt = new Date(d+'T12:00:00');
+    const label = isToday ? 'Today' : (i===1 ? 'Tmrw' : SHORT_DAYS[dt.getDay()]+' '+dt.getDate());
     const dots = MEMBERS.map(mm => {
-      // Only today can have real data; future days show as upcoming
-      const st = isToday ? (log[mm.id] || 'none') : 'upcoming';
-      const ring = isToday ? ' today-ring' : '';
-      return `<div class="day-dot ${st}${ring}">${st === 'green' ? '✓' : st === 'amber' ? '~' : st === 'red' ? '✗' : ''}</div>`;
+      const st = isToday ? (log[mm.id]||'none') : 'upcoming';
+      return `<div class="day-dot ${st}${isToday?' today-ring':''}">${st==='green'?'✓':st==='amber'?'~':st==='red'?'✗':''}</div>`;
     }).join('');
-    return `<div class="day-cell"><div class="day-label" style="${isToday ? 'color:var(--orange);font-weight:800;' : ''}">${shortLabel}</div>${dots}</div>`;
+    return `<div class="day-cell"><div class="day-label" style="${isToday?'color:var(--orange);font-weight:800;':''}">${label}</div>${dots}</div>`;
   }).join('');
 }
-
 function logRag(status) {
   const tk = todayKey();
   if (!appData.daily[tk]) appData.daily[tk] = {};
-  appData.daily[tk][currentUser] = status;
-  saveData();
-  if (status === 'green') { launchConfetti(); showToast('🎉 Green day! +3 points! You rock!'); }
-  else if (status === 'amber') showToast('🟡 Good effort! +1pt. Push a bit harder tomorrow!');
+  appData.daily[tk][currentUser] = status; saveData();
+  if (status==='green') { launchConfetti(); showToast('🎉 Green day! +3 points! You rock!'); }
+  else if (status==='amber') showToast('🟡 Good effort! +1pt. Push a bit harder tomorrow!');
   else showToast('💪 Over budget today — fresh start tomorrow!');
   renderToday();
-  const wkPts = MEMBERS.map(mm => ({ ...mm, pts: calcPoints(mm.id, true) }));
+  const wkPts = MEMBERS.map(mm => ({...mm, pts: calcPoints(mm.id,true)}));
   document.getElementById('week-pts-row').innerHTML = wkPts.map(mm =>
-    `<div class="pts-badge">${mm.emoji} ${mm.name.split(' ')[0]} ${mm.pts}pts</div>`
-  ).join('');
+    `<div class="pts-badge">${mm.emoji} ${mm.name.split(' ')[0]} ${mm.pts}pts</div>`).join('');
 }
 
 // ===== WEEKLY =====
 function renderWeekly() {
   const wk = weekKey();
-  document.getElementById('week-label').textContent = 'Week ' + wk + ' — Record your weight below';
+  document.getElementById('week-label').textContent = 'Week '+wk+' — Record your weight below';
   const wData = appData.weekly[wk] || {};
   document.getElementById('weigh-in-entries').innerHTML = MEMBERS.map(m =>
-    `<div class="weight-entry"><span class="we-name">${m.emoji} ${m.name}</span><div class="we-input-wrap"><input class="we-input" type="number" inputmode="decimal" step="0.1" min="30" max="300" id="wi-${m.id}" placeholder="e.g. 72.5" value="${wData[m.id] || ''}"><span class="we-unit">kg</span></div></div>`
+    `<div class="weight-entry"><span class="we-name">${m.emoji} ${m.name}</span><div class="we-input-wrap"><input class="we-input" type="number" inputmode="decimal" step="0.1" min="30" max="300" id="wi-${m.id}" placeholder="e.g. 72.5" value="${wData[m.id]||''}"><span class="we-unit">kg</span></div></div>`
   ).join('');
   renderProgressRings();
 }
-
 function saveWeighIn() {
-  const wk = weekKey();
-  if (!appData.weekly[wk]) appData.weekly[wk] = {};
+  const wk = weekKey(); if (!appData.weekly[wk]) appData.weekly[wk] = {};
   let saved = false;
-  MEMBERS.forEach(m => {
-    const v = document.getElementById('wi-' + m.id)?.value;
-    if (v && !isNaN(v) && parseFloat(v) > 0) { appData.weekly[wk][m.id] = parseFloat(v); saved = true; }
-  });
+  MEMBERS.forEach(m => { const v = document.getElementById('wi-'+m.id)?.value; if (v&&!isNaN(v)&&parseFloat(v)>0) { appData.weekly[wk][m.id]=parseFloat(v); saved=true; } });
   if (saved) { saveData(); renderProgressRings(); confettiSmall(); showToast('✅ Weights saved! Great progress!'); }
   else showToast('⚠️ Enter at least one weight.');
 }
-
 function renderProgressRings() {
   document.getElementById('progress-rings').innerHTML = MEMBERS.map(m => {
-    const s = appData.settings[m.id] || {};
-    const start = parseFloat(s.startWeight), target = parseFloat(s.targetWeight);
-    let latest = null;
-    for (const wk of Object.keys(appData.weekly).sort().reverse())
-      if (appData.weekly[wk]?.[m.id]) { latest = appData.weekly[wk][m.id]; break; }
-    let pct = 0;
-    const lbl = latest ? latest + 'kg' : 'No data';
-    const sub = target ? 'Target: ' + target + 'kg' : 'No target set';
-    if (start && target && latest) {
-      const loss = start - target;
-      pct = loss > 0 ? Math.min(100, Math.max(0, ((start - latest) / loss) * 100)) : 0;
-    }
-    const r = 40, circ = 2 * Math.PI * r, dash = circ - (pct / 100) * circ;
-    const col = pct >= 80 ? '#06D6A0' : pct >= 40 ? '#FFD166' : '#FF6B35';
+    const s = appData.settings[m.id]||{}, start=parseFloat(s.startWeight), target=parseFloat(s.targetWeight);
+    let latest=null;
+    for (const wk of Object.keys(appData.weekly).sort().reverse()) if (appData.weekly[wk]?.[m.id]) { latest=appData.weekly[wk][m.id]; break; }
+    let pct=0, lbl=latest?latest+'kg':'No data', sub=target?'Target: '+target+'kg':'No target set';
+    if (start&&target&&latest) { const loss=start-target; pct=loss>0?Math.min(100,Math.max(0,((start-latest)/loss)*100)):0; }
+    const r=40, circ=2*Math.PI*r, dash=circ-(pct/100)*circ, col=pct>=80?'#06D6A0':pct>=40?'#FFD166':'#FF6B35';
     return `<div class="ring-item"><svg width="90" height="90" viewBox="0 0 90 90"><circle cx="45" cy="45" r="${r}" fill="none" stroke="#F0F0F0" stroke-width="7"/><circle cx="45" cy="45" r="${r}" fill="none" stroke="${col}" stroke-width="7" stroke-linecap="round" stroke-dasharray="${circ.toFixed(1)}" stroke-dashoffset="${dash.toFixed(1)}" transform="rotate(-90 45 45)" style="transition:stroke-dashoffset 1s ease;"/><text x="45" y="41" text-anchor="middle" font-size="9.5" font-weight="700" fill="#2D2D2D" font-family="Poppins">${lbl}</text><text x="45" y="54" text-anchor="middle" font-size="8.5" fill="#999" font-family="Poppins">${Math.round(pct)}%</text></svg><div class="ring-label">${m.emoji} ${m.name}</div><div class="ring-sub">${sub}</div></div>`;
   }).join('');
 }
 
 // ===== LEADERBOARD =====
 function renderLeaderboard() {
-  const weekPts = MEMBERS.map(m => ({
-    ...m, wPts: calcPoints(m.id, true),
-    tPts: calcPoints(m.id, false), streak: calcStreak(m.id)
-  })).sort((a, b) => b.wPts - a.wPts);
-
-  // Podium order: silver, gold, bronze
-  const po = weekPts.length >= 3 ? [weekPts[1], weekPts[0], weekPts[2]] : weekPts;
-  const pClass = ['p2', 'p1', 'p3'], pMedal = ['🥈', '🥇', '🥉'];
-  document.getElementById('podium').innerHTML = po.map((m, i) =>
-    `<div class="podium-slot ${pClass[i]}"><div style="font-size:1.8rem;margin-bottom:4px;">${m.emoji}</div><div class="podium-block">${pMedal[i]}</div><div class="podium-name">${m.name}</div><div class="podium-pts">${m.wPts} pts</div></div>`
-  ).join('');
-
-  const allTime = MEMBERS.map(m => ({
-    ...m, tPts: calcPoints(m.id, false), streak: calcStreak(m.id)
-  })).sort((a, b) => b.tPts - a.tPts);
-  const medals = ['🥇', '🥈', '🥉'];
-  document.getElementById('rank-list').innerHTML = allTime.map((m, i) =>
-    `<div class="rank-row"><div class="rank-pos">${medals[i] || (i + 1)}</div><div class="rank-avatar">${m.emoji}</div><div class="rank-info"><div class="rank-name">${m.name}${m.streak >= 2 ? ' 🔥' + m.streak : ''}</div><div class="rank-sub">This week: ${calcPoints(m.id, true)} pts</div></div><div class="rank-pts">${m.tPts} pts</div></div>`
-  ).join('');
+  const weekPts = MEMBERS.map(m => ({...m, wPts:calcPoints(m.id,true), tPts:calcPoints(m.id,false), streak:calcStreak(m.id)})).sort((a,b)=>b.wPts-a.wPts);
+  const po = weekPts.length>=3 ? [weekPts[1],weekPts[0],weekPts[2]] : weekPts;
+  const pClass=['p2','p1','p3'], pMedal=['🥈','🥇','🥉'];
+  document.getElementById('podium').innerHTML = po.map((m,i) =>
+    `<div class="podium-slot ${pClass[i]}"><div style="font-size:1.8rem;margin-bottom:4px;">${m.emoji}</div><div class="podium-block">${pMedal[i]}</div><div class="podium-name">${m.name}</div><div class="podium-pts">${m.wPts} pts</div></div>`).join('');
+  const allTime = MEMBERS.map(m => ({...m, tPts:calcPoints(m.id,false), streak:calcStreak(m.id)})).sort((a,b)=>b.tPts-a.tPts);
+  const medals=['🥇','🥈','🥉'];
+  document.getElementById('rank-list').innerHTML = allTime.map((m,i) =>
+    `<div class="rank-row"><div class="rank-pos">${medals[i]||(i+1)}</div><div class="rank-avatar">${m.emoji}</div><div class="rank-info"><div class="rank-name">${m.name}${m.streak>=2?' 🔥'+m.streak:''}</div><div class="rank-sub">This week: ${calcPoints(m.id,true)} pts</div></div><div class="rank-pts">${m.tPts} pts</div></div>`).join('');
 }
 
 // ===== SETTINGS =====
 function renderSettings() {
   document.getElementById('weight-settings').innerHTML = MEMBERS.map(m => {
-    const s = appData.settings[m.id] || {};
-    return `<div class="settings-row"><span class="settings-name">${m.emoji} ${m.name}</span><div class="settings-inputs"><div><input class="settings-input" type="number" inputmode="decimal" step="0.1" id="sw-${m.id}" placeholder="Start" value="${s.startWeight || ''}"><div class="settings-lbl">Start kg</div></div><div><input class="settings-input" type="number" inputmode="decimal" step="0.1" id="tw-${m.id}" placeholder="Target" value="${s.targetWeight || ''}"><div class="settings-lbl">Target kg</div></div></div></div>`;
+    const s = appData.settings[m.id]||{};
+    return `<div class="settings-row"><span class="settings-name">${m.emoji} ${m.name}</span><div class="settings-inputs"><div><input class="settings-input" type="number" inputmode="decimal" step="0.1" id="sw-${m.id}" placeholder="Start" value="${s.startWeight||''}"><div class="settings-lbl">Start kg</div></div><div><input class="settings-input" type="number" inputmode="decimal" step="0.1" id="tw-${m.id}" placeholder="Target" value="${s.targetWeight||''}"><div class="settings-lbl">Target kg</div></div></div></div>`;
   }).join('');
-
-  const pinSetData = JSON.parse(localStorage.getItem(PIN_SET_KEY) || '{}');
+  const pinSetData = JSON.parse(localStorage.getItem(PIN_SET_KEY)||'{}');
   const myPinNotSet = !pinSetData[currentUser];
-
-  // Show a notice banner if this user hasn't changed their PIN yet
   document.getElementById('pin-first-notice').innerHTML = myPinNotSet
-    ? `<div class="pin-first-notice">🔐 You're using the default PIN. Set a personal PIN below to secure your account!</div>`
-    : '';
-
+    ? `<div class="pin-first-notice">🔐 You're using the default PIN. Set a personal PIN below!</div>` : '';
   document.getElementById('pin-settings').innerHTML = MEMBERS.map(m => {
-    const highlight = (!pinSetData[m.id] && m.id === currentUser) ? ' highlight' : '';
-    return `<div class="pin-change-row${highlight}"><span class="pin-change-name">${m.emoji} ${m.name}</span><input class="pin-change-input" type="password" inputmode="numeric" maxlength="4" pattern="[0-9]*" id="np-${m.id}" placeholder="New PIN"></div>`;
+    const hl = (!pinSetData[m.id] && m.id===currentUser) ? ' highlight' : '';
+    return `<div class="pin-change-row${hl}"><span class="pin-change-name">${m.emoji} ${m.name}</span><input class="pin-change-input" type="password" inputmode="numeric" maxlength="4" pattern="[0-9]*" id="np-${m.id}" placeholder="New PIN"></div>`;
   }).join('');
-
-  // Auto-focus the current user's PIN field on first login
-  if (myPinNotSet) {
-    setTimeout(() => document.getElementById('np-' + currentUser)?.focus(), 300);
-  }
+  if (myPinNotSet) setTimeout(() => document.getElementById('np-'+currentUser)?.focus(), 300);
 }
-
 function saveSettings() {
-  let ch = false;
+  let ch=false;
   MEMBERS.forEach(m => {
-    const sw = document.getElementById('sw-' + m.id)?.value;
-    const tw = document.getElementById('tw-' + m.id)?.value;
-    if (!appData.settings[m.id]) appData.settings[m.id] = {};
-    if (sw && parseFloat(sw) > 0) { appData.settings[m.id].startWeight = parseFloat(sw); ch = true; }
-    if (tw && parseFloat(tw) > 0) { appData.settings[m.id].targetWeight = parseFloat(tw); ch = true; }
+    const sw=document.getElementById('sw-'+m.id)?.value, tw=document.getElementById('tw-'+m.id)?.value;
+    if (!appData.settings[m.id]) appData.settings[m.id]={};
+    if (sw&&parseFloat(sw)>0) { appData.settings[m.id].startWeight=parseFloat(sw); ch=true; }
+    if (tw&&parseFloat(tw)>0) { appData.settings[m.id].targetWeight=parseFloat(tw); ch=true; }
   });
   if (ch) { saveData(); renderWeekly(); showToast('✅ Settings saved!'); }
   else showToast('⚠️ No changes to save.');
 }
-
 function savePins() {
-  const pins = loadPins();
-  const pinSetData = JSON.parse(localStorage.getItem(PIN_SET_KEY) || '{}');
-  let ch = false;
+  const pins=loadPins(), pinSetData=JSON.parse(localStorage.getItem(PIN_SET_KEY)||'{}');
+  let ch=false;
   MEMBERS.forEach(m => {
-    const v = document.getElementById('np-' + m.id)?.value;
-    if (v && /^\d{4}$/.test(v)) {
-      pins[m.id] = v;
-      pinSetData[m.id] = true; // mark as set
-      ch = true;
-    }
+    const v=document.getElementById('np-'+m.id)?.value;
+    if (v&&/^\d{4}$/.test(v)) { pins[m.id]=v; pinSetData[m.id]=true; ch=true; }
   });
   if (ch) {
-    storePins(pins);
-    localStorage.setItem(PIN_SET_KEY, JSON.stringify(pinSetData));
+    storePins(pins); localStorage.setItem(PIN_SET_KEY,JSON.stringify(pinSetData));
     showToast('🔐 PIN saved! Log out to test it.');
-    MEMBERS.forEach(m => { const el = document.getElementById('np-' + m.id); if (el) el.value = ''; });
-    renderSettings(); // refresh to remove notice banner
-  } else {
-    showToast('⚠️ Enter a valid 4-digit PIN.');
-  }
+    MEMBERS.forEach(m => { const el=document.getElementById('np-'+m.id); if(el) el.value=''; });
+    renderSettings();
+  } else showToast('⚠️ Enter a valid 4-digit PIN.');
 }
 
 // ===== NAV =====
 function switchTab(tab, btn) {
   document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.bn-item').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-' + tab).classList.add('active');
+  document.getElementById('tab-'+tab).classList.add('active');
   btn.classList.add('active');
-  window.scrollTo(0, 0);
-  if (tab === 'today')    renderToday();
-  if (tab === 'weekly')   renderWeekly();
-  if (tab === 'board')    renderLeaderboard();
-  if (tab === 'settings') renderSettings();
+  window.scrollTo(0,0);
+  if (tab==='today')    renderToday();
+  if (tab==='weekly')   renderWeekly();
+  if (tab==='board')    renderLeaderboard();
+  if (tab==='settings') renderSettings();
 }
 
 // ===== CONFETTI =====
 function launchConfetti() {
-  const cols = ['#FF6B35', '#FFD166', '#06D6A0', '#118AB2', '#EF476F', '#FFF'];
-  for (let i = 0; i < 60; i++) {
-    const p = document.createElement('div');
-    p.className = 'confetti-piece';
-    p.style.cssText = `left:${Math.random() * 100}vw;top:-12px;background:${cols[Math.floor(Math.random() * cols.length)]};width:${6 + Math.random() * 8}px;height:${6 + Math.random() * 8}px;border-radius:${Math.random() > .5 ? '50%' : '3px'};--dur:${1.6 + Math.random() * 1.8}s;animation-delay:${Math.random() * 0.4}s;`;
-    document.body.appendChild(p);
-    p.addEventListener('animationend', () => p.remove());
+  const cols=['#FF6B35','#FFD166','#06D6A0','#118AB2','#EF476F','#FFF'];
+  for (let i=0; i<60; i++) {
+    const p=document.createElement('div'); p.className='confetti-piece';
+    p.style.cssText=`left:${Math.random()*100}vw;top:-12px;background:${cols[Math.floor(Math.random()*cols.length)]};width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;border-radius:${Math.random()>.5?'50%':'3px'};--dur:${1.6+Math.random()*1.8}s;animation-delay:${Math.random()*0.4}s;`;
+    document.body.appendChild(p); p.addEventListener('animationend', ()=>p.remove());
   }
 }
 function confettiSmall() {
-  const cols = ['#FF6B35', '#FFD166', '#06D6A0'];
-  for (let i = 0; i < 20; i++) {
-    const p = document.createElement('div');
-    p.className = 'confetti-piece';
-    p.style.cssText = `left:${25 + Math.random() * 50}vw;top:35vh;background:${cols[i % 3]};width:8px;height:8px;border-radius:50%;--dur:${1 + Math.random()}s;animation-delay:${Math.random() * 0.2}s;`;
-    document.body.appendChild(p);
-    p.addEventListener('animationend', () => p.remove());
+  const cols=['#FF6B35','#FFD166','#06D6A0'];
+  for (let i=0; i<20; i++) {
+    const p=document.createElement('div'); p.className='confetti-piece';
+    p.style.cssText=`left:${25+Math.random()*50}vw;top:35vh;background:${cols[i%3]};width:8px;height:8px;border-radius:50%;--dur:${1+Math.random()}s;animation-delay:${Math.random()*0.2}s;`;
+    document.body.appendChild(p); p.addEventListener('animationend', ()=>p.remove());
   }
 }
 
-// ===== TOAST =====
 let _tt;
 function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  clearTimeout(_tt); _tt = setTimeout(() => t.classList.remove('show'), 3200);
+  const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(_tt); _tt=setTimeout(()=>t.classList.remove('show'), 3200);
 }
 
-// ===== BOOT =====
-document.addEventListener('DOMContentLoaded', () => {
-  if (currentUser) showApp(false);
-});
+document.addEventListener('DOMContentLoaded', () => { if (currentUser) showApp(false); });
 </script>
 </body>
 </html>
