@@ -269,6 +269,24 @@
     .rag-circle.none  { background: #E0E0E0; color: #999; }
     .rag-circle-label { font-size: 0.6rem; color: var(--text-light); }
 
+    .weeks-overview { display: flex; gap: 6px; margin-bottom: 10px; }
+    .week-chip { flex: 1; text-align: center; padding: 8px 4px; border-radius: 10px; background: #F4F4F4; font-size: 0.62rem; font-weight: 700; color: var(--text-light); }
+    .week-chip .wk-num { display: block; font-family: 'Fredoka One', cursive; font-size: 0.85rem; margin-bottom: 2px; color: var(--text); }
+    .week-chip.active { background: linear-gradient(135deg, #FF6B35, #FFD166); color: white; }
+    .week-chip.active .wk-num { color: white; }
+    .week-range { font-size: 0.78rem; font-weight: 700; text-align: center; color: var(--text-light); margin-bottom: 8px; }
+
+    .weighin-banner { background: linear-gradient(135deg, #EF476F 0%, #FF6B35 100%); color: white; text-align: center; }
+    .weighin-icon { font-size: 2rem; display: block; margin-bottom: 6px; animation: pulseRing 2s ease-in-out infinite; }
+    .weighin-msg { font-size: 0.88rem; font-weight: 600; line-height: 1.4; }
+    .weighin-due-note { background: #FFF0E8; color: #9A4B00; font-size: 0.78rem; font-weight: 600; padding: 8px 12px; border-radius: 10px; margin-bottom: 12px; }
+
+    .trend-item { margin-bottom: 16px; }
+    .trend-item:last-child { margin-bottom: 0; }
+    .trend-name { font-weight: 700; font-size: 0.85rem; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+    .trend-delta { font-size: 0.75rem; font-weight: 700; }
+    .trend-empty { font-size: 0.76rem; color: var(--text-light); }
+
     .week-strip { display: flex; gap: 3px; overflow-x: auto; padding-bottom: 4px; }
     .week-strip::-webkit-scrollbar { display: none; }
     .day-cell { flex: 0 0 calc(14.28% - 3px); min-width: 38px; text-align: center; }
@@ -427,6 +445,11 @@
       <span class="motivation-emoji" id="mot-emoji"></span>
       <div class="motivation-quote" id="mot-quote"></div>
     </div>
+    <div class="card weighin-banner" id="weighin-reminder" style="display:none;">
+      <span class="weighin-icon">&#9878;&#65039;</span>
+      <div class="weighin-msg" id="weighin-msg"></div>
+      <button class="save-btn" onclick="goToWeeklyTab()" style="margin-top:10px;background:rgba(255,255,255,0.25);">Go to Weekly Weigh-in</button>
+    </div>
     <div class="card">
       <div class="card-title">&#127919; My Daily Check-in</div>
       <div id="streak-area"></div>
@@ -443,7 +466,9 @@
       <div class="family-row" id="family-today"></div>
     </div>
     <div class="card">
-      <div class="card-title">&#128197; Next 7 Days</div>
+      <div class="card-title">&#128197; Challenge Calendar</div>
+      <div class="weeks-overview" id="weeks-overview"></div>
+      <p class="week-range" id="week-range"></p>
       <div class="week-strip" id="week-strip"></div>
     </div>
   </div>
@@ -452,12 +477,17 @@
     <div class="card" style="margin-top:14px;">
       <div class="card-title">&#9878;&#65039; Weekly Weigh-in</div>
       <p style="font-size:0.76rem;color:var(--text-light);margin-bottom:12px;" id="week-label"></p>
+      <p class="weighin-due-note" id="weighin-due-note" style="display:none;"></p>
       <div id="weigh-in-entries"></div>
       <button class="save-btn" onclick="saveWeighIn()">&#128190; Save Weights</button>
     </div>
     <div class="card">
       <div class="card-title">&#128200; Progress to Target</div>
       <div class="progress-ring-wrap" id="progress-rings"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">&#128201; Weight Trend</div>
+      <div id="weight-trend"></div>
     </div>
   </div>
 
@@ -528,13 +558,34 @@ let currentUser = sessionStorage.getItem(SESSION_KEY);
 let pinBuffer = '', loginName = '', pinBusy = false;
 
 function todayKey() { return new Date().toISOString().split('T')[0]; }
-function weekKey(d) {
-  const dt = d ? new Date(d) : new Date();
-  const doy = Math.floor((dt - new Date(dt.getFullYear(),0,0)) / 86400000);
-  return dt.getFullYear() + '-W' + String(Math.ceil((doy+1)/7)).padStart(2,'0');
+const CHALLENGE_START = '2026-06-15';
+const CHALLENGE_WEEKS = 4;
+function challengeWeekDates(idx) {
+  const start = new Date(CHALLENGE_START+'T12:00:00');
+  start.setDate(start.getDate() + idx*7);
+  return Array.from({length:7}, (_,i) => { const d = new Date(start); d.setDate(d.getDate()+i); return d.toISOString().split('T')[0]; });
 }
-function getForwardDates() {
-  return Array.from({length:7}, (_,i) => { const d = new Date(); d.setDate(d.getDate()+i); return d.toISOString().split('T')[0]; });
+function challengeWeekIndex(dateStr) {
+  const start = new Date(CHALLENGE_START+'T12:00:00');
+  const d = new Date((dateStr||todayKey())+'T12:00:00');
+  let idx = Math.floor((d-start)/86400000/7);
+  if (idx < 0) idx = 0;
+  if (idx > CHALLENGE_WEEKS-1) idx = CHALLENGE_WEEKS-1;
+  return idx;
+}
+function challengeWeekKey(dateStr) { return 'cw'+(challengeWeekIndex(dateStr)+1); }
+function fmtShort(d) { return d.toLocaleDateString('en-GB',{day:'numeric',month:'short'}); }
+function weekRangeLabel(idx) {
+  const dates = challengeWeekDates(idx);
+  return fmtShort(new Date(dates[0]+'T12:00:00')) + ' – ' + fmtShort(new Date(dates[6]+'T12:00:00'));
+}
+function weighInDate(idx) { return challengeWeekDates(idx)[5]; }
+function weighInDue() {
+  const tk = todayKey(), widx = challengeWeekIndex(tk), sat = weighInDate(widx);
+  if (tk < sat) return null;
+  const wk = challengeWeekKey(tk);
+  if (appData.weekly[wk]?.[currentUser]) return null;
+  return { widx, wk, sat };
 }
 const SHORT_DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 function memberInfo(id) { return MEMBERS.find(m => m.id === id); }
@@ -550,9 +601,9 @@ function calcStreak(id) {
   return streak;
 }
 function calcPoints(id, weekOnly) {
-  const wk = weekKey(); let pts = 0;
+  const wk = challengeWeekKey(); let pts = 0;
   Object.entries(appData.daily).forEach(([date, day]) => {
-    if (weekOnly && weekKey(date) !== wk) return;
+    if (weekOnly && challengeWeekKey(date) !== wk) return;
     if (day[id] === 'green') pts += 3; else if (day[id] === 'amber') pts += 1;
   });
   if (weekOnly) {
@@ -679,16 +730,33 @@ function renderToday() {
     const st = todayLog[mm.id] || 'none';
     return `<div class="member-card-sm"><div class="member-name-sm">${mm.emoji} ${mm.name.slice(0,7)}</div><div class="rag-circle ${st}">${icons[st]}</div><div class="rag-circle-label">${st==='none'?'Not yet':st}</div></div>`;
   }).join('');
-  renderWeekStrip();
+  const widx = challengeWeekIndex(tk);
+  renderWeeksOverview(widx);
+  document.getElementById('week-range').textContent = `Week ${widx+1}: ${weekRangeLabel(widx)}`;
+  renderWeekStrip(widx);
+  const due = weighInDue(), banner = document.getElementById('weighin-reminder');
+  if (due) {
+    banner.style.display = 'block';
+    document.getElementById('weighin-msg').textContent = `⚖️ It's weigh-in time! Log your weight for Week ${due.widx+1} (${weekRangeLabel(due.widx)}).`;
+  } else {
+    banner.style.display = 'none';
+  }
 }
-function renderWeekStrip() {
-  const dates = getForwardDates(), tk = todayKey();
-  document.getElementById('week-strip').innerHTML = dates.map((d,i) => {
-    const log = appData.daily[d] || {}, isToday = i===0;
+function renderWeeksOverview(widx) {
+  document.getElementById('weeks-overview').innerHTML = Array.from({length:CHALLENGE_WEEKS}, (_,i) => {
+    const dates = challengeWeekDates(i);
+    const label = fmtShort(new Date(dates[0]+'T12:00:00')) + '–' + fmtShort(new Date(dates[6]+'T12:00:00'));
+    return `<div class="week-chip${i===widx?' active':''}"><span class="wk-num">W${i+1}</span>${label}</div>`;
+  }).join('');
+}
+function renderWeekStrip(widx) {
+  const dates = challengeWeekDates(widx), tk = todayKey();
+  document.getElementById('week-strip').innerHTML = dates.map(d => {
+    const log = appData.daily[d] || {}, isToday = d === tk, isFuture = d > tk;
     const dt = new Date(d+'T12:00:00');
-    const label = isToday ? 'Today' : (i===1 ? 'Tmrw' : SHORT_DAYS[dt.getDay()]+' '+dt.getDate());
+    const label = SHORT_DAYS[dt.getDay()]+' '+dt.getDate();
     const dots = MEMBERS.map(mm => {
-      const st = isToday ? (log[mm.id]||'none') : 'upcoming';
+      const st = isFuture ? 'upcoming' : (log[mm.id] || 'none');
       return `<div class="day-dot ${st}${isToday?' today-ring':''}">${st==='green'?'✓':st==='amber'?'~':st==='red'?'✗':''}</div>`;
     }).join('');
     return `<div class="day-cell"><div class="day-label" style="${isToday?'color:var(--orange);font-weight:800;':''}">${label}</div>${dots}</div>`;
@@ -709,20 +777,51 @@ function logRag(status) {
 
 // ===== WEEKLY =====
 function renderWeekly() {
-  const wk = weekKey();
-  document.getElementById('week-label').textContent = 'Week '+wk+' — Record your weight below';
+  const widx = challengeWeekIndex(todayKey()), wk = challengeWeekKey();
+  document.getElementById('week-label').textContent = `Week ${widx+1} (${weekRangeLabel(widx)}) — Record your weight below`;
   const wData = appData.weekly[wk] || {};
   document.getElementById('weigh-in-entries').innerHTML = MEMBERS.map(m =>
     `<div class="weight-entry"><span class="we-name">${m.emoji} ${m.name}</span><div class="we-input-wrap"><input class="we-input" type="number" inputmode="decimal" step="0.1" min="30" max="300" id="wi-${m.id}" placeholder="e.g. 72.5" value="${wData[m.id]||''}"><span class="we-unit">kg</span></div></div>`
   ).join('');
+  const due = weighInDue(), note = document.getElementById('weighin-due-note');
+  if (due) { note.textContent = `⚖️ Your weigh-in for Week ${due.widx+1} is due — enter your weight below!`; note.style.display = 'block'; }
+  else note.style.display = 'none';
   renderProgressRings();
+  renderWeightTrend();
 }
 function saveWeighIn() {
-  const wk = weekKey(); if (!appData.weekly[wk]) appData.weekly[wk] = {};
+  const wk = challengeWeekKey(); if (!appData.weekly[wk]) appData.weekly[wk] = {};
   let saved = false;
   MEMBERS.forEach(m => { const v = document.getElementById('wi-'+m.id)?.value; if (v&&!isNaN(v)&&parseFloat(v)>0) { appData.weekly[wk][m.id]=parseFloat(v); saved=true; } });
-  if (saved) { saveData(); renderProgressRings(); confettiSmall(); showToast('✅ Weights saved! Great progress!'); }
+  if (saved) { saveData(); renderProgressRings(); renderWeightTrend(); confettiSmall(); showToast('✅ Weights saved! Great progress!'); document.getElementById('weighin-due-note').style.display='none'; }
   else showToast('⚠️ Enter at least one weight.');
+}
+function renderWeightTrend() {
+  document.getElementById('weight-trend').innerHTML = MEMBERS.map(m => {
+    const s = appData.settings[m.id] || {}, start = parseFloat(s.startWeight), target = parseFloat(s.targetWeight);
+    const pts = [];
+    if (start) pts.push({ label:'Start', v:start });
+    for (let i=1;i<=CHALLENGE_WEEKS;i++) { const v = appData.weekly['cw'+i]?.[m.id]; if (v) pts.push({ label:'W'+i, v:parseFloat(v) }); }
+    if (pts.length < 2) {
+      return `<div class="trend-item"><div class="trend-name">${m.emoji} ${m.name}</div><p class="trend-empty">Not enough weigh-ins yet to show a trend.</p></div>`;
+    }
+    const vals = pts.map(p=>p.v).concat(target?[target]:[]);
+    const min = Math.min(...vals), max = Math.max(...vals), range = (max-min)||1;
+    const W=260, H=90, padX=16, padY=14;
+    const stepX = (W-padX*2)/(pts.length-1);
+    const xy = pts.map((p,i)=>({x:padX+i*stepX, y: padY+(1-(p.v-min)/range)*(H-padY*2)}));
+    const path = xy.map((p,i)=>`${i===0?'M':'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+    const delta = pts[pts.length-1].v - pts[0].v, decreasing = delta < 0;
+    const lineColor = decreasing ? '#06D6A0' : '#EF476F';
+    let targetLine = '';
+    if (target) {
+      const ty = padY+(1-(target-min)/range)*(H-padY*2);
+      targetLine = `<line x1="${padX}" y1="${ty.toFixed(1)}" x2="${W-padX}" y2="${ty.toFixed(1)}" stroke="#118AB2" stroke-width="1.5" stroke-dasharray="4,3"/>`;
+    }
+    const dots = xy.map(p=>`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="3.5" fill="${lineColor}"/>`).join('');
+    const labels = pts.map((p,i)=>`<text x="${xy[i].x.toFixed(1)}" y="${H-2}" font-size="7" text-anchor="middle" fill="#999" font-family="Poppins">${p.label}</text>`).join('');
+    return `<div class="trend-item"><div class="trend-name">${m.emoji} ${m.name} <span class="trend-delta" style="color:${lineColor}">${decreasing?'▼':'▲'} ${Math.abs(delta).toFixed(1)}kg</span></div><svg width="100%" height="${H}" viewBox="0 0 ${W} ${H}">${targetLine}<path d="${path}" fill="none" stroke="${lineColor}" stroke-width="2.5"/>${dots}${labels}</svg></div>`;
+  }).join('');
 }
 function renderProgressRings() {
   document.getElementById('progress-rings').innerHTML = MEMBERS.map(m => {
@@ -792,6 +891,7 @@ function savePins() {
 }
 
 // ===== NAV =====
+function goToWeeklyTab() { switchTab('weekly', document.querySelectorAll('.bn-item')[1]); }
 function switchTab(tab, btn) {
   document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.bn-item').forEach(b => b.classList.remove('active'));
