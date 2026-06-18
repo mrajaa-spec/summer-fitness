@@ -574,9 +574,16 @@ function loadData() {
 function cacheData() { localStorage.setItem(DATA_KEY, JSON.stringify(appData)); }
 function loadPins() { return pinsCache; }
 
-let appData = loadData();
-let pinsCache = (() => { const s = localStorage.getItem(PINS_KEY); return s ? JSON.parse(s) : { ...DEFAULT_PINS }; })();
-let pinSetCache = JSON.parse(localStorage.getItem(PIN_SET_KEY) || '{}');
+// Snapshot of this device's pre-Firebase local data, used once to migrate
+// anything the shared database doesn't have yet (so existing entries don't
+// get wiped by the first empty/partial snapshot from Firebase).
+const localDataSnapshot = loadData();
+const localPinsSnapshot = (() => { const s = localStorage.getItem(PINS_KEY); return s ? JSON.parse(s) : null; })();
+const localPinSetSnapshot = JSON.parse(localStorage.getItem(PIN_SET_KEY) || '{}');
+
+let appData = localDataSnapshot;
+let pinsCache = localPinsSnapshot || { ...DEFAULT_PINS };
+let pinSetCache = localPinSetSnapshot;
 let currentUser = sessionStorage.getItem(SESSION_KEY);
 let pinBuffer = '', loginName = '', pinBusy = false;
 let selectedDate = null, viewingWeekIdx = null;
@@ -596,19 +603,68 @@ function refreshActiveTab() {
     `<div class="pts-badge">${mm.emoji} ${mm.name.split(' ')[0]} ${mm.pts}pts</div>`).join('');
 }
 
+function migrateLocalData(local, remote) {
+  Object.entries(local.settings || {}).forEach(([id, s]) => {
+    const remoteS = remote.settings[id] || (remote.settings[id] = {});
+    const updates = {};
+    if (s.startWeight != null && remoteS.startWeight == null) updates.startWeight = s.startWeight;
+    if (s.targetWeight != null && remoteS.targetWeight == null) updates.targetWeight = s.targetWeight;
+    if (Object.keys(updates).length) { dataRef.child('settings/'+id).update(updates); Object.assign(remoteS, updates); }
+  });
+  Object.entries(local.daily || {}).forEach(([date, day]) => {
+    Object.entries(day).forEach(([id, status]) => {
+      if (!remote.daily[date]?.[id]) {
+        dataRef.child('daily/'+date+'/'+id).set(status);
+        (remote.daily[date] || (remote.daily[date] = {}))[id] = status;
+      }
+    });
+  });
+  Object.entries(local.weekly || {}).forEach(([wk, entry]) => {
+    Object.entries(entry).forEach(([id, w]) => {
+      if (remote.weekly[wk]?.[id] == null) {
+        dataRef.child('weekly/'+wk+'/'+id).set(w);
+        (remote.weekly[wk] || (remote.weekly[wk] = {}))[id] = w;
+      }
+    });
+  });
+}
+
+let dataMigrated = false;
 dataRef.on('value', snap => {
   const val = snap.val();
   appData = { settings: val?.settings || {}, daily: val?.daily || {}, weekly: val?.weekly || {} };
+  if (!dataMigrated) { dataMigrated = true; migrateLocalData(localDataSnapshot, appData); }
   cacheData();
   refreshActiveTab();
 });
+let pinsMigrated = false;
 pinsRef.on('value', snap => {
-  const val = snap.val();
-  if (val) { pinsCache = val; localStorage.setItem(PINS_KEY, JSON.stringify(pinsCache)); }
-  else pinsRef.set(DEFAULT_PINS);
+  let val = snap.val();
+  if (!pinsMigrated) {
+    pinsMigrated = true;
+    if (!val) {
+      const customPins = localPinsSnapshot
+        ? Object.fromEntries(Object.entries(localPinsSnapshot).filter(([id]) => localPinSetSnapshot[id]))
+        : {};
+      const merged = { ...DEFAULT_PINS, ...customPins };
+      pinsRef.set(merged);
+      val = merged;
+    }
+  }
+  pinsCache = val || DEFAULT_PINS;
+  localStorage.setItem(PINS_KEY, JSON.stringify(pinsCache));
 });
+let pinSetMigrated = false;
 pinSetRef.on('value', snap => {
-  pinSetCache = snap.val() || {};
+  let val = snap.val();
+  if (!pinSetMigrated) {
+    pinSetMigrated = true;
+    if (!val && Object.keys(localPinSetSnapshot).length) {
+      pinSetRef.set(localPinSetSnapshot);
+      val = localPinSetSnapshot;
+    }
+  }
+  pinSetCache = val || {};
   localStorage.setItem(PIN_SET_KEY, JSON.stringify(pinSetCache));
 });
 
