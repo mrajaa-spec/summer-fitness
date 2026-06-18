@@ -274,6 +274,8 @@
     .week-chip .wk-num { display: block; font-family: 'Fredoka One', cursive; font-size: 0.85rem; margin-bottom: 2px; color: var(--text); }
     .week-chip.active { background: linear-gradient(135deg, #FF6B35, #FFD166); color: white; }
     .week-chip.active .wk-num { color: white; }
+    .week-chip-clickable { cursor: pointer; }
+    .week-chip.disabled { opacity: 0.45; }
     .week-range { font-size: 0.78rem; font-weight: 700; text-align: center; color: var(--text-light); margin-bottom: 8px; }
 
     .weighin-banner { background: linear-gradient(135deg, #EF476F 0%, #FF6B35 100%); color: white; text-align: center; }
@@ -298,6 +300,8 @@
     .day-dot.none  { background: #E8E8E8; color: #BBB; }
     .day-dot.upcoming { background: #F2F2F2; color: #CCC; }
     .day-dot.today-ring { outline: 2px solid var(--orange); outline-offset: 2px; }
+    .day-cell-clickable { cursor: pointer; }
+    .day-cell.selected-day { background: #FFF3E0; border-radius: 10px; }
 
     .weight-entry { display: flex; align-items: center; gap: 10px; padding: 12px 0; border-bottom: 1px solid #F4F4F4; }
     .weight-entry:last-child { border-bottom: none; }
@@ -460,6 +464,7 @@
         <button class="rag-btn red-btn" onclick="logRag('red')"><span class="rag-emoji">&#128997;</span>Over budget</button>
       </div>
       <div id="logged-note" class="logged-note"></div>
+      <div id="checkin-edit-note" style="text-align:center;margin-top:6px;"></div>
     </div>
     <div class="card">
       <div class="card-title">&#128106; Family Today</div>
@@ -556,6 +561,7 @@ function saveData() { localStorage.setItem(DATA_KEY, JSON.stringify(appData)); }
 let appData = loadData();
 let currentUser = sessionStorage.getItem(SESSION_KEY);
 let pinBuffer = '', loginName = '', pinBusy = false;
+let selectedDate = null, viewingWeekIdx = null;
 
 function todayKey() { return new Date().toISOString().split('T')[0]; }
 const CHALLENGE_START = '2026-06-15';
@@ -580,6 +586,7 @@ function weekRangeLabel(idx) {
   return fmtShort(new Date(dates[0]+'T12:00:00')) + ' – ' + fmtShort(new Date(dates[6]+'T12:00:00'));
 }
 function weighInDate(idx) { return challengeWeekDates(idx)[5]; }
+function fmtCheckinDate(d) { return new Date(d+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'}); }
 function weighInDue() {
   const tk = todayKey(), widx = challengeWeekIndex(tk), sat = weighInDate(widx);
   if (tk < sat) return null;
@@ -720,20 +727,31 @@ function renderToday() {
   const streak = calcStreak(currentUser);
   document.getElementById('streak-area').innerHTML = streak >= 2
     ? `<div class="streak-badge"><span class="flame-icon">🔥</span>${streak} day streak!</div>` : '';
-  const tk = todayKey(), myStatus = appData.daily[tk]?.[currentUser];
-  document.getElementById('checkin-label').textContent = myStatus ? 'Logged today:' : 'How are your calories today?';
+
+  const tk = todayKey();
+  if (!selectedDate) selectedDate = tk;
+  const sd = selectedDate, isToday = sd === tk, myStatus = appData.daily[sd]?.[currentUser];
+  document.getElementById('checkin-label').textContent = isToday
+    ? (myStatus ? 'Logged today:' : 'How are your calories today?')
+    : (myStatus ? `Logged for ${fmtCheckinDate(sd)}:` : `How were your calories on ${fmtCheckinDate(sd)}?`);
   document.getElementById('logged-note').textContent = myStatus ? '✔ Tap to change' : '';
   document.getElementById('rag-buttons').querySelectorAll('.rag-btn').forEach(b => b.classList.remove('selected'));
   if (myStatus) { const sel = document.querySelector('.'+myStatus+'-btn'); if (sel) sel.classList.add('selected'); }
+  document.getElementById('checkin-edit-note').innerHTML = isToday
+    ? `<span style="font-size:0.7rem;color:var(--text-light);">Tap a day in the calendar below to edit a past entry</span>`
+    : `<span style="font-size:0.78rem;color:var(--orange);font-weight:700;">✏️ Editing ${fmtCheckinDate(sd)} — <a href="javascript:void(0)" onclick="backToToday()" style="color:var(--blue);text-decoration:underline;">Back to Today</a></span>`;
+
   const todayLog = appData.daily[tk] || {}, icons = {green:'✓',amber:'~',red:'✗',none:'?'};
   document.getElementById('family-today').innerHTML = MEMBERS.map(mm => {
     const st = todayLog[mm.id] || 'none';
     return `<div class="member-card-sm"><div class="member-name-sm">${mm.emoji} ${mm.name.slice(0,7)}</div><div class="rag-circle ${st}">${icons[st]}</div><div class="rag-circle-label">${st==='none'?'Not yet':st}</div></div>`;
   }).join('');
-  const widx = challengeWeekIndex(tk);
-  renderWeeksOverview(widx);
-  document.getElementById('week-range').textContent = `Week ${widx+1}: ${weekRangeLabel(widx)}`;
-  renderWeekStrip(widx);
+
+  const currentWidx = challengeWeekIndex(tk);
+  if (viewingWeekIdx === null || viewingWeekIdx > currentWidx) viewingWeekIdx = currentWidx;
+  renderWeeksOverview(viewingWeekIdx, currentWidx);
+  document.getElementById('week-range').textContent = `Week ${viewingWeekIdx+1}: ${weekRangeLabel(viewingWeekIdx)}`;
+  renderWeekStrip(viewingWeekIdx);
   const due = weighInDue(), banner = document.getElementById('weighin-reminder');
   if (due) {
     banner.style.display = 'block';
@@ -742,33 +760,50 @@ function renderToday() {
     banner.style.display = 'none';
   }
 }
-function renderWeeksOverview(widx) {
+function renderWeeksOverview(viewingWidx, currentWidx) {
   document.getElementById('weeks-overview').innerHTML = Array.from({length:CHALLENGE_WEEKS}, (_,i) => {
     const dates = challengeWeekDates(i);
     const label = fmtShort(new Date(dates[0]+'T12:00:00')) + '–' + fmtShort(new Date(dates[6]+'T12:00:00'));
-    return `<div class="week-chip${i===widx?' active':''}"><span class="wk-num">W${i+1}</span>${label}</div>`;
+    const future = i > currentWidx;
+    const cls = `week-chip${i===viewingWidx?' active':''}${future?' disabled':' week-chip-clickable'}`;
+    const click = future ? '' : ` onclick="viewWeek(${i})"`;
+    return `<div class="${cls}"${click}><span class="wk-num">W${i+1}</span>${label}</div>`;
   }).join('');
 }
 function renderWeekStrip(widx) {
   const dates = challengeWeekDates(widx), tk = todayKey();
   document.getElementById('week-strip').innerHTML = dates.map(d => {
-    const log = appData.daily[d] || {}, isToday = d === tk, isFuture = d > tk;
+    const log = appData.daily[d] || {}, isToday = d === tk, isFuture = d > tk, isSelected = d === selectedDate;
     const dt = new Date(d+'T12:00:00');
     const label = SHORT_DAYS[dt.getDay()]+' '+dt.getDate();
     const dots = MEMBERS.map(mm => {
       const st = isFuture ? 'upcoming' : (log[mm.id] || 'none');
       return `<div class="day-dot ${st}${isToday?' today-ring':''}">${st==='green'?'✓':st==='amber'?'~':st==='red'?'✗':''}</div>`;
     }).join('');
-    return `<div class="day-cell"><div class="day-label" style="${isToday?'color:var(--orange);font-weight:800;':''}">${label}</div>${dots}</div>`;
+    const cellCls = `day-cell${isFuture?'':' day-cell-clickable'}${isSelected?' selected-day':''}`;
+    const click = isFuture ? '' : ` onclick="selectCheckinDate('${d}')"`;
+    return `<div class="${cellCls}"${click}><div class="day-label" style="${isToday?'color:var(--orange);font-weight:800;':''}">${label}</div>${dots}</div>`;
   }).join('');
 }
+function selectCheckinDate(d) {
+  if (d > todayKey()) return;
+  selectedDate = d; renderToday(); window.scrollTo(0,0);
+}
+function backToToday() {
+  selectedDate = todayKey(); viewingWeekIdx = null; renderToday();
+}
+function viewWeek(i) {
+  const cw = challengeWeekIndex(todayKey());
+  if (i < 0 || i > cw) return;
+  viewingWeekIdx = i; renderToday();
+}
 function logRag(status) {
-  const tk = todayKey();
-  if (!appData.daily[tk]) appData.daily[tk] = {};
-  appData.daily[tk][currentUser] = status; saveData();
-  if (status==='green') { launchConfetti(); showToast('🎉 Green day! +3 points! You rock!'); }
-  else if (status==='amber') showToast('🟡 Good effort! +1pt. Push a bit harder tomorrow!');
-  else showToast('💪 Over budget today — fresh start tomorrow!');
+  const sd = selectedDate || todayKey(), isToday = sd === todayKey();
+  if (!appData.daily[sd]) appData.daily[sd] = {};
+  appData.daily[sd][currentUser] = status; saveData();
+  if (status==='green') { launchConfetti(); showToast(isToday ? '🎉 Green day! +3 points! You rock!' : `🎉 Updated ${fmtCheckinDate(sd)} to Green!`); }
+  else if (status==='amber') showToast(isToday ? '🟡 Good effort! +1pt. Push a bit harder tomorrow!' : `🟡 Updated ${fmtCheckinDate(sd)} to Amber.`);
+  else showToast(isToday ? '💪 Over budget today — fresh start tomorrow!' : `Updated ${fmtCheckinDate(sd)} to Over budget.`);
   renderToday();
   const wkPts = MEMBERS.map(mm => ({...mm, pts: calcPoints(mm.id,true)}));
   document.getElementById('week-pts-row').innerHTML = wkPts.map(mm =>
@@ -898,7 +933,7 @@ function switchTab(tab, btn) {
   document.getElementById('tab-'+tab).classList.add('active');
   btn.classList.add('active');
   window.scrollTo(0,0);
-  if (tab==='today')    renderToday();
+  if (tab==='today')    { selectedDate = todayKey(); viewingWeekIdx = null; renderToday(); }
   if (tab==='weekly')   renderWeekly();
   if (tab==='board')    renderLeaderboard();
   if (tab==='settings') renderSettings();
