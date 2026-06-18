@@ -526,7 +526,24 @@
 
 <div class="toast" id="toast"></div>
 
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
 <script>
+const firebaseConfig = {
+  apiKey: "AIzaSyDI8Ag2Ib_R4IdJbNSjstZGraA0izP15bE",
+  authDomain: "summer-fitness-2026.firebaseapp.com",
+  databaseURL: "https://summer-fitness-2026-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "summer-fitness-2026",
+  storageBucket: "summer-fitness-2026.firebasestorage.app",
+  messagingSenderId: "361511911996",
+  appId: "1:361511911996:web:c4000d41810fcbe876b939"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const dataRef = db.ref('swlc_data');
+const pinsRef = db.ref('swlc_pins');
+const pinSetRef = db.ref('swlc_pinset');
+
 const MEMBERS = [
   { id: 'pallavi', name: 'Pallavi', emoji: '🌸' },
   { id: 'ashwini', name: 'Ashwini', emoji: '🌺' },
@@ -549,19 +566,51 @@ const QUOTES = [
   { e:'🙏', t:'Be patient with yourself — great things take time.' }
 ];
 
-function loadPins() { const s = localStorage.getItem(PINS_KEY); return s ? JSON.parse(s) : { ...DEFAULT_PINS }; }
-function storePins(p) { localStorage.setItem(PINS_KEY, JSON.stringify(p)); }
 function loadData() {
   const s = localStorage.getItem(DATA_KEY);
   if (s) return JSON.parse(s);
-  return { settings: { pallavi:{startWeight:null,targetWeight:null}, ashwini:{startWeight:null,targetWeight:null}, murali:{startWeight:null,targetWeight:null} }, daily:{}, weekly:{} };
+  return { settings: {}, daily:{}, weekly:{} };
 }
-function saveData() { localStorage.setItem(DATA_KEY, JSON.stringify(appData)); }
+function cacheData() { localStorage.setItem(DATA_KEY, JSON.stringify(appData)); }
+function loadPins() { return pinsCache; }
 
 let appData = loadData();
+let pinsCache = (() => { const s = localStorage.getItem(PINS_KEY); return s ? JSON.parse(s) : { ...DEFAULT_PINS }; })();
+let pinSetCache = JSON.parse(localStorage.getItem(PIN_SET_KEY) || '{}');
 let currentUser = sessionStorage.getItem(SESSION_KEY);
 let pinBuffer = '', loginName = '', pinBusy = false;
 let selectedDate = null, viewingWeekIdx = null;
+
+function refreshActiveTab() {
+  if (!currentUser || !document.getElementById('app').classList.contains('active')) return;
+  const active = document.querySelector('.tab-content.active');
+  if (active) {
+    const id = active.id.replace('tab-','');
+    if (id==='today') renderToday();
+    else if (id==='weekly') renderWeekly();
+    else if (id==='board') renderLeaderboard();
+    else if (id==='settings') renderSettings();
+  }
+  const wkPts = MEMBERS.map(mm => ({ ...mm, pts: calcPoints(mm.id,true) }));
+  document.getElementById('week-pts-row').innerHTML = wkPts.map(mm =>
+    `<div class="pts-badge">${mm.emoji} ${mm.name.split(' ')[0]} ${mm.pts}pts</div>`).join('');
+}
+
+dataRef.on('value', snap => {
+  const val = snap.val();
+  appData = { settings: val?.settings || {}, daily: val?.daily || {}, weekly: val?.weekly || {} };
+  cacheData();
+  refreshActiveTab();
+});
+pinsRef.on('value', snap => {
+  const val = snap.val();
+  if (val) { pinsCache = val; localStorage.setItem(PINS_KEY, JSON.stringify(pinsCache)); }
+  else pinsRef.set(DEFAULT_PINS);
+});
+pinSetRef.on('value', snap => {
+  pinSetCache = snap.val() || {};
+  localStorage.setItem(PIN_SET_KEY, JSON.stringify(pinSetCache));
+});
 
 function todayKey() { return new Date().toISOString().split('T')[0]; }
 const CHALLENGE_START = '2026-06-15';
@@ -666,8 +715,7 @@ function checkPin() {
   if (pins[loginName] === pinBuffer) {
     sessionStorage.setItem(SESSION_KEY, loginName);
     currentUser = loginName;
-    const pinSetData = JSON.parse(localStorage.getItem(PIN_SET_KEY) || '{}');
-    showApp(!pinSetData[loginName]);
+    showApp(!pinSetCache[loginName]);
   } else {
     const pd = document.getElementById('pin-dots');
     for (let i = 0; i < 4; i++) document.getElementById('dot-'+i).classList.remove('success');
@@ -800,7 +848,8 @@ function viewWeek(i) {
 function logRag(status) {
   const sd = selectedDate || todayKey(), isToday = sd === todayKey();
   if (!appData.daily[sd]) appData.daily[sd] = {};
-  appData.daily[sd][currentUser] = status; saveData();
+  appData.daily[sd][currentUser] = status; cacheData();
+  dataRef.child('daily/'+sd+'/'+currentUser).set(status);
   if (status==='green') { launchConfetti(); showToast(isToday ? '🎉 Green day! +3 points! You rock!' : `🎉 Updated ${fmtCheckinDate(sd)} to Green!`); }
   else if (status==='amber') showToast(isToday ? '🟡 Good effort! +1pt. Push a bit harder tomorrow!' : `🟡 Updated ${fmtCheckinDate(sd)} to Amber.`);
   else showToast(isToday ? '💪 Over budget today — fresh start tomorrow!' : `Updated ${fmtCheckinDate(sd)} to Over budget.`);
@@ -827,8 +876,15 @@ function renderWeekly() {
 function saveWeighIn() {
   const wk = challengeWeekKey(); if (!appData.weekly[wk]) appData.weekly[wk] = {};
   let saved = false;
-  MEMBERS.forEach(m => { const v = document.getElementById('wi-'+m.id)?.value; if (v&&!isNaN(v)&&parseFloat(v)>0) { appData.weekly[wk][m.id]=parseFloat(v); saved=true; } });
-  if (saved) { saveData(); renderProgressRings(); renderWeightTrend(); confettiSmall(); showToast('✅ Weights saved! Great progress!'); document.getElementById('weighin-due-note').style.display='none'; }
+  MEMBERS.forEach(m => {
+    const v = document.getElementById('wi-'+m.id)?.value;
+    if (v&&!isNaN(v)&&parseFloat(v)>0) {
+      appData.weekly[wk][m.id]=parseFloat(v);
+      dataRef.child('weekly/'+wk+'/'+m.id).set(parseFloat(v));
+      saved=true;
+    }
+  });
+  if (saved) { cacheData(); renderProgressRings(); renderWeightTrend(); confettiSmall(); showToast('✅ Weights saved! Great progress!'); document.getElementById('weighin-due-note').style.display='none'; }
   else showToast('⚠️ Enter at least one weight.');
 }
 function renderWeightTrend() {
@@ -889,12 +945,11 @@ function renderSettings() {
     const s = appData.settings[m.id]||{};
     return `<div class="settings-row"><span class="settings-name">${m.emoji} ${m.name}</span><div class="settings-inputs"><div><input class="settings-input" type="number" inputmode="decimal" step="0.1" id="sw-${m.id}" placeholder="Start" value="${s.startWeight||''}"><div class="settings-lbl">Start kg</div></div><div><input class="settings-input" type="number" inputmode="decimal" step="0.1" id="tw-${m.id}" placeholder="Target" value="${s.targetWeight||''}"><div class="settings-lbl">Target kg</div></div></div></div>`;
   }).join('');
-  const pinSetData = JSON.parse(localStorage.getItem(PIN_SET_KEY)||'{}');
-  const myPinNotSet = !pinSetData[currentUser];
+  const myPinNotSet = !pinSetCache[currentUser];
   document.getElementById('pin-first-notice').innerHTML = myPinNotSet
     ? `<div class="pin-first-notice">🔐 You're using the default PIN. Set a personal PIN below!</div>` : '';
   document.getElementById('pin-settings').innerHTML = MEMBERS.map(m => {
-    const hl = (!pinSetData[m.id] && m.id===currentUser) ? ' highlight' : '';
+    const hl = (!pinSetCache[m.id] && m.id===currentUser) ? ' highlight' : '';
     return `<div class="pin-change-row${hl}"><span class="pin-change-name">${m.emoji} ${m.name}</span><input class="pin-change-input" type="password" inputmode="numeric" maxlength="4" pattern="[0-9]*" id="np-${m.id}" placeholder="New PIN"></div>`;
   }).join('');
   if (myPinNotSet) setTimeout(() => document.getElementById('np-'+currentUser)?.focus(), 300);
@@ -904,21 +959,27 @@ function saveSettings() {
   MEMBERS.forEach(m => {
     const sw=document.getElementById('sw-'+m.id)?.value, tw=document.getElementById('tw-'+m.id)?.value;
     if (!appData.settings[m.id]) appData.settings[m.id]={};
-    if (sw&&parseFloat(sw)>0) { appData.settings[m.id].startWeight=parseFloat(sw); ch=true; }
-    if (tw&&parseFloat(tw)>0) { appData.settings[m.id].targetWeight=parseFloat(tw); ch=true; }
+    const updates = {};
+    if (sw&&parseFloat(sw)>0) { appData.settings[m.id].startWeight=parseFloat(sw); updates.startWeight=parseFloat(sw); ch=true; }
+    if (tw&&parseFloat(tw)>0) { appData.settings[m.id].targetWeight=parseFloat(tw); updates.targetWeight=parseFloat(tw); ch=true; }
+    if (Object.keys(updates).length) dataRef.child('settings/'+m.id).update(updates);
   });
-  if (ch) { saveData(); renderWeekly(); showToast('✅ Settings saved!'); }
+  if (ch) { cacheData(); renderWeekly(); showToast('✅ Settings saved!'); }
   else showToast('⚠️ No changes to save.');
 }
 function savePins() {
-  const pins=loadPins(), pinSetData=JSON.parse(localStorage.getItem(PIN_SET_KEY)||'{}');
   let ch=false;
   MEMBERS.forEach(m => {
     const v=document.getElementById('np-'+m.id)?.value;
-    if (v&&/^\d{4}$/.test(v)) { pins[m.id]=v; pinSetData[m.id]=true; ch=true; }
+    if (v&&/^\d{4}$/.test(v)) {
+      pinsCache[m.id]=v; pinSetCache[m.id]=true; ch=true;
+      pinsRef.child(m.id).set(v);
+      pinSetRef.child(m.id).set(true);
+    }
   });
   if (ch) {
-    storePins(pins); localStorage.setItem(PIN_SET_KEY,JSON.stringify(pinSetData));
+    localStorage.setItem(PINS_KEY, JSON.stringify(pinsCache));
+    localStorage.setItem(PIN_SET_KEY, JSON.stringify(pinSetCache));
     showToast('🔐 PIN saved! Log out to test it.');
     MEMBERS.forEach(m => { const el=document.getElementById('np-'+m.id); if(el) el.value=''; });
     renderSettings();
