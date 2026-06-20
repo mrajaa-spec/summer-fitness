@@ -311,6 +311,11 @@
     .we-input:focus { border-color: var(--orange); }
     .we-unit { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: var(--text-light); font-size: 0.75rem; }
 
+    .weighin-date-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .weighin-date-row label { font-size: 0.78rem; font-weight: 700; color: var(--text-light); white-space: nowrap; }
+    .weighin-date-input { flex: 1; padding: 10px 12px; border: 2px solid #EEE; border-radius: 10px; font-family: 'Poppins', sans-serif; font-size: 0.9rem; outline: none; transition: border-color 0.2s; -webkit-appearance: none; }
+    .weighin-date-input:focus { border-color: var(--orange); }
+
     .progress-ring-wrap { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 10px; }
     .ring-item { text-align: center; }
     .ring-label { font-size: 0.78rem; font-weight: 700; margin-top: 5px; }
@@ -480,11 +485,16 @@
 
   <div id="tab-weekly" class="tab-content">
     <div class="card" style="margin-top:14px;">
-      <div class="card-title">&#9878;&#65039; Weekly Weigh-in</div>
+      <div class="card-title">&#9878;&#65039; Log Your Weight</div>
       <p style="font-size:0.76rem;color:var(--text-light);margin-bottom:12px;" id="week-label"></p>
       <p class="weighin-due-note" id="weighin-due-note" style="display:none;"></p>
+      <div class="weighin-date-row">
+        <label for="wi-date">Date</label>
+        <input type="date" id="wi-date" class="weighin-date-input" onchange="onWeighDateChange()">
+      </div>
+      <div id="weighin-edit-note" style="text-align:center;margin-bottom:10px;"></div>
       <div id="weigh-in-entries"></div>
-      <button class="save-btn" onclick="saveWeighIn()">&#128190; Save Weights</button>
+      <button class="save-btn" onclick="saveWeighIn()">&#128190; Save Weight</button>
     </div>
     <div class="card">
       <div class="card-title">&#128200; Progress to Target</div>
@@ -692,12 +702,19 @@ function weekRangeLabel(idx) {
 }
 function weighInDate(idx) { return challengeWeekDates(idx)[5]; }
 function fmtCheckinDate(d) { return new Date(d+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'}); }
+function weightInRange(id, startDate, endDate) {
+  let val = null;
+  Object.keys(appData.weekly).filter(d => d >= startDate && d <= endDate).sort().forEach(d => {
+    if (appData.weekly[d]?.[id] != null) val = appData.weekly[d][id];
+  });
+  return val;
+}
 function weighInDue() {
   const tk = todayKey(), widx = challengeWeekIndex(tk), sat = weighInDate(widx);
   if (tk < sat) return null;
-  const wk = challengeWeekKey(tk);
-  if (appData.weekly[wk]?.[currentUser]) return null;
-  return { widx, wk, sat };
+  const dates = challengeWeekDates(widx);
+  if (weightInRange(currentUser, dates[0], dates[6]) != null) return null;
+  return { widx, sat };
 }
 const SHORT_DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 function memberInfo(id) { return MEMBERS.find(m => m.id === id); }
@@ -719,8 +736,9 @@ function calcPoints(id, weekOnly) {
     if (day[id] === 'green') pts += 3; else if (day[id] === 'amber') pts += 1;
   });
   if (weekOnly) {
-    const w = appData.weekly[wk], s = appData.settings[id];
-    if (w?.[id] && s?.targetWeight && parseFloat(w[id]) <= parseFloat(s.targetWeight)) pts += 5;
+    const dates = challengeWeekDates(challengeWeekIndex());
+    const w = weightInRange(id, dates[0], dates[6]), s = appData.settings[id];
+    if (w != null && s?.targetWeight && parseFloat(w) <= parseFloat(s.targetWeight)) pts += 5;
   }
   return pts;
 }
@@ -917,38 +935,57 @@ function logRag(status) {
 
 // ===== WEEKLY =====
 function renderWeekly() {
-  const widx = challengeWeekIndex(todayKey()), wk = challengeWeekKey();
-  document.getElementById('week-label').textContent = `Week ${widx+1} (${weekRangeLabel(widx)}) — Record your weight below`;
-  const wData = appData.weekly[wk] || {};
-  document.getElementById('weigh-in-entries').innerHTML = MEMBERS.map(m =>
-    `<div class="weight-entry"><span class="we-name">${m.emoji} ${m.name}</span><div class="we-input-wrap"><input class="we-input" type="number" inputmode="decimal" step="0.1" min="30" max="300" id="wi-${m.id}" placeholder="e.g. 72.5" value="${wData[m.id]||''}"><span class="we-unit">kg</span></div></div>`
-  ).join('');
+  const widx = challengeWeekIndex(todayKey());
+  document.getElementById('week-label').textContent = `Week ${widx+1} (${weekRangeLabel(widx)}) — log any day this week, or pick a past date to correct an entry`;
+  const dateInput = document.getElementById('wi-date');
+  dateInput.min = CHALLENGE_START;
+  dateInput.max = todayKey();
+  if (!dateInput.value) dateInput.value = todayKey();
+  renderWeighEntries();
   const due = weighInDue(), note = document.getElementById('weighin-due-note');
   if (due) { note.textContent = `⚖️ Your weigh-in for Week ${due.widx+1} is due — enter your weight below!`; note.style.display = 'block'; }
   else note.style.display = 'none';
   renderProgressRings();
   renderWeightTrend();
 }
+function renderWeighEntries() {
+  const dateInput = document.getElementById('wi-date');
+  const date = dateInput.value || todayKey();
+  const wData = appData.weekly[date] || {};
+  document.getElementById('weighin-edit-note').innerHTML = date === todayKey() ? '' :
+    `<span style="font-size:0.78rem;color:var(--orange);font-weight:700;">✏️ Editing ${fmtCheckinDate(date)} — <a href="javascript:void(0)" onclick="resetWeighDate()" style="color:var(--blue);text-decoration:underline;">Back to Today</a></span>`;
+  document.getElementById('weigh-in-entries').innerHTML = MEMBERS.map(m =>
+    `<div class="weight-entry"><span class="we-name">${m.emoji} ${m.name}</span><div class="we-input-wrap"><input class="we-input" type="number" inputmode="decimal" step="0.1" min="30" max="300" id="wi-${m.id}" placeholder="e.g. 72.5" value="${wData[m.id]||''}"><span class="we-unit">kg</span></div></div>`
+  ).join('');
+}
+function onWeighDateChange() { renderWeighEntries(); }
+function resetWeighDate() { document.getElementById('wi-date').value = todayKey(); renderWeighEntries(); }
 function saveWeighIn() {
-  const wk = challengeWeekKey(); if (!appData.weekly[wk]) appData.weekly[wk] = {};
+  const date = document.getElementById('wi-date').value || todayKey();
+  if (date > todayKey()) { showToast('⚠️ Cannot log a future date.'); return; }
+  if (!appData.weekly[date]) appData.weekly[date] = {};
   let saved = false;
   MEMBERS.forEach(m => {
     const v = document.getElementById('wi-'+m.id)?.value;
     if (v&&!isNaN(v)&&parseFloat(v)>0) {
-      appData.weekly[wk][m.id]=parseFloat(v);
-      dataRef.child('weekly/'+wk+'/'+m.id).set(parseFloat(v));
+      appData.weekly[date][m.id]=parseFloat(v);
+      dataRef.child('weekly/'+date+'/'+m.id).set(parseFloat(v));
       saved=true;
     }
   });
-  if (saved) { cacheData(); renderProgressRings(); renderWeightTrend(); confettiSmall(); showToast('✅ Weights saved! Great progress!'); document.getElementById('weighin-due-note').style.display='none'; }
-  else showToast('⚠️ Enter at least one weight.');
+  if (saved) {
+    cacheData(); renderProgressRings(); renderWeightTrend(); confettiSmall();
+    showToast(date===todayKey() ? '✅ Weight saved! Great progress!' : `✅ Updated entry for ${fmtCheckinDate(date)}!`);
+    document.getElementById('weighin-due-note').style.display='none';
+  } else showToast('⚠️ Enter at least one weight.');
 }
 function renderWeightTrend() {
   document.getElementById('weight-trend').innerHTML = MEMBERS.map(m => {
     const s = appData.settings[m.id] || {}, start = parseFloat(s.startWeight), target = parseFloat(s.targetWeight);
+    const entryDates = Object.keys(appData.weekly).filter(d => appData.weekly[d]?.[m.id] != null).sort();
     const pts = [];
     if (start) pts.push({ label:'Start', v:start });
-    for (let i=1;i<=CHALLENGE_WEEKS;i++) { const v = appData.weekly['cw'+i]?.[m.id]; if (v) pts.push({ label:'W'+i, v:parseFloat(v) }); }
+    entryDates.forEach(d => pts.push({ label: fmtShort(new Date(d+'T12:00:00')), v: parseFloat(appData.weekly[d][m.id]) }));
     if (pts.length < 2) {
       return `<div class="trend-item"><div class="trend-name">${m.emoji} ${m.name}</div><p class="trend-empty">Not enough weigh-ins yet to show a trend.</p></div>`;
     }
@@ -966,7 +1003,8 @@ function renderWeightTrend() {
       targetLine = `<line x1="${padX}" y1="${ty.toFixed(1)}" x2="${W-padX}" y2="${ty.toFixed(1)}" stroke="#118AB2" stroke-width="1.5" stroke-dasharray="4,3"/>`;
     }
     const dots = xy.map(p=>`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="3.5" fill="${lineColor}"/>`).join('');
-    const labels = pts.map((p,i)=>`<text x="${xy[i].x.toFixed(1)}" y="${H-2}" font-size="7" text-anchor="middle" fill="#999" font-family="Poppins">${p.label}</text>`).join('');
+    const labelEvery = Math.max(1, Math.ceil(pts.length/6));
+    const labels = pts.map((p,i)=> (i%labelEvery===0 || i===pts.length-1) ? `<text x="${xy[i].x.toFixed(1)}" y="${H-2}" font-size="7" text-anchor="middle" fill="#999" font-family="Poppins">${p.label}</text>` : '').join('');
     return `<div class="trend-item"><div class="trend-name">${m.emoji} ${m.name} <span class="trend-delta" style="color:${lineColor}">${decreasing?'▼':'▲'} ${Math.abs(delta).toFixed(1)}kg</span></div><svg width="100%" height="${H}" viewBox="0 0 ${W} ${H}">${targetLine}<path d="${path}" fill="none" stroke="${lineColor}" stroke-width="2.5"/>${dots}${labels}</svg></div>`;
   }).join('');
 }
