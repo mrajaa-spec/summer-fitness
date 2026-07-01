@@ -701,7 +701,7 @@ pinSetRef.on('value', snap => {
 
 function todayKey() { return new Date().toISOString().split('T')[0]; }
 const CHALLENGE_START = '2026-06-15';
-const CHALLENGE_WEEKS = 4;
+const CHALLENGE_WEEKS = 5;
 function challengeWeekDates(idx) {
   const start = new Date(CHALLENGE_START+'T12:00:00');
   start.setDate(start.getDate() + idx*7);
